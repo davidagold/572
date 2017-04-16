@@ -1,0 +1,52 @@
+\begin{thebibliography}{}
+
+\bibitem[Angrist and Krueger, 1991]{AK91}
+Angrist, J.~D. and Krueger, A.~B. (1991).
+\newblock Does compulsory school attendance affect schooling and earnings?
+\newblock {\em The Quarterly Journal of Economics}.
+
+\bibitem[Becker, 1994]{B94}
+Becker, P.~A. (1994).
+\newblock Alternative approximations to the distributions of the instrumental
+  variable estimators.
+\newblock {\em Econometrica}.
+
+\bibitem[Belloni et~al., 2011]{BCH11}
+Belloni, A., Chernozhukov, V., and Hansen, C. (2011).
+\newblock Inference for high-dimensional sparse econometric models.
+\newblock {\em Advances in Economics and Econometrics}.
+
+\bibitem[B{\"u}hlmann and van~de Geer, 2011]{BvdG11}
+B{\"u}hlmann, P. and van~de Geer, S. (2011).
+\newblock {\em Statistics for High-Dimensional Data}.
+\newblock Springer.
+
+\bibitem[Buna and Windmeijer, 2011]{BW11}
+Buna, M.~J. and Windmeijer, F. (2011).
+\newblock A comparison of bias approximations for the two-stage least squares
+  (2sls) estimator.
+\newblock {\em Economic Letters}.
+
+\bibitem[Fuller, 1977]{F77}
+Fuller, W.~A. (1977).
+\newblock Some properties of a modification of the limited information
+  estimator.
+\newblock {\em Econometrica}.
+
+\bibitem[Gautier and Tsybakov, 2014]{GT14}
+Gautier, E. and Tsybakov, A.~B. (2014).
+\newblock High-dimensional instrumental variables regression and confidence
+  sets.
+\newblock {\em ArXiv:1105.2454v4}.
+
+\bibitem[Hansen et~al., 2008]{HHN08}
+Hansen, C., Hausman, J., and Newey, W. (2008).
+\newblock Estimation with many instrumental variables.
+\newblock {\em Journal of Business and Economic Statistics}.
+
+\bibitem[Newey, 1997]{N97}
+Newey, W.~K. (1997).
+\newblock Convergence rates and asymptotic normality for series estimators.
+\newblock {\em Journal of Econometrics}.
+
+\end{thebibliography}

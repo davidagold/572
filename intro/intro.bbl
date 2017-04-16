@@ -1,0 +1,74 @@
+\begin{thebibliography}{12}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Angrist and Krueger(1991)]{AK91}
+Joshua~D. Angrist and Alan~B. Krueger.
+\newblock Does compulsory school attendance affect schooling and earnings?
+\newblock \emph{The Quarterly Journal of Economics}, 1991.
+
+\bibitem[Angrist and Krueger(2001)]{AK01}
+Joshua~D. Angrist and Alan~B. Krueger.
+\newblock Instrumental variables and the search for identification: From supply
+  and demand to natural experiments.
+\newblock \emph{Journal of Economic Perspectives}, 15\penalty0 (4):\penalty0
+  69--85, 2001.
+
+\bibitem[Becker(1994)]{B94}
+Paul~A. Becker.
+\newblock Alternative approximations to the distributions of the instrumental
+  variable estimators.
+\newblock \emph{Econometrica}, 1994.
+
+\bibitem[Belloni et~al.(2011)Belloni, Chernozhukov, and Hansen]{BCH11}
+Alexandre Belloni, Victor Chernozhukov, and Christian Hansen.
+\newblock Inference for high-dimensional sparse econometric models.
+\newblock \emph{Advances in Economics and Econometrics}, 2011.
+
+\bibitem[B{\"u}hlmann and van~de Geer(2011)]{BvdG11}
+Peter B{\"u}hlmann and Sara van~de Geer.
+\newblock \emph{Statistics for High-Dimensional Data}.
+\newblock Springer, 2011.
+
+\bibitem[Buna and Windmeijer(2011)]{BW11}
+Maurice~J.G. Buna and Frank Windmeijer.
+\newblock A comparison of bias approximations for the two-stage least squares
+  (2sls) estimator.
+\newblock \emph{Economic Letters}, 2011.
+
+\bibitem[Fuller(1977)]{F77}
+Wayne~A. Fuller.
+\newblock Some properties of a modification of the limited information
+  estimator.
+\newblock \emph{Econometrica}, 1977.
+
+\bibitem[Gautier and Tsybakov(2014)]{GT14}
+Eric Gautier and Alexandre~B. Tsybakov.
+\newblock High-dimensional instrumental variables regression and confidence
+  sets.
+\newblock \emph{ArXiv:1105.2454v4}, 2014.
+
+\bibitem[Hansen et~al.(2008)Hansen, Hausman, and Newey]{HHN08}
+Christian Hansen, Jerry Hausman, and Whitney Newey.
+\newblock Estimation with many instrumental variables.
+\newblock \emph{Journal of Business and Economic Statistics}, 2008.
+
+\bibitem[Newey(1997)]{N97}
+Whitney~K. Newey.
+\newblock Convergence rates and asymptotic normality for series estimators.
+\newblock \emph{Journal of Econometrics}, 1997.
+
+\bibitem[Pearl(2009)]{P09}
+Judea Pearl.
+\newblock \emph{Causality: Models, Reasoning and Inference}.
+\newblock Cambridge University Press, 2nd edition, 2009.
+
+\bibitem[Robinson(1988)]{R88}
+P.M. Robinson.
+\newblock Root-n-consistent semiparametric regression.
+\newblock \emph{Econometrica}, 56\penalty0 (4):\penalty0 931--954, 1988.
+
+\end{thebibliography}
