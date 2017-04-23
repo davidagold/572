@@ -1,0 +1,268 @@
+\documentclass{article}
+
+%%\setlength{\oddsidemargin}{0.25in}
+%%\setlength{\textwidth}{6in}
+%%\setlength{\topmargin}{0.5in}
+%%\setlength{\textheight}{9in}
+
+%\renewcommand{\baselinestretch}{1.5} 
+
+\usepackage{amsmath,amsfonts,amsthm,amssymb,amscd}
+\usepackage[margin=1.15in]{geometry}
+\usepackage{mathrsfs}
+\usepackage{bbm}
+\usepackage{bm}
+\usepackage{mathtools}
+\usepackage{cancel}
+\usepackage{listings}
+\usepackage{booktabs}
+
+% Begin/End
+\newcommand{\be}{\begin{equation}}
+\newcommand{\ee}{\end{equation}}
+\newcommand{\benn}{\begin{equation*}}
+\newcommand{\eenn}{\end{equation*}}
+
+% Theorem-like Environments
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{conj}[thm]{Conjecture}
+\newtheorem{cor}[thm]{Corollary}
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{exa}[thm]{Example}
+\newtheorem{defi}[thm]{Definition}
+\newtheorem{exe}[thm]{Exercise}
+\newtheorem{rek}[thm]{Remark}
+\newtheorem{que}[thm]{Question}
+\newtheorem{prob}[thm]{Problem}
+\newtheorem{cla}[thm]{Claim}
+\newtheorem{esti}[thm]{Estimation}
+\newtheorem{assu}[thm]{Assumption}
+
+% Two-Case and Three-Case Definitions
+\newcommand{\twocase}[5]{#1 \begin{cases} #2 & \text{#3}\\ #4
+&\text{#5} \end{cases}   }
+\newcommand{\threecase}[7]{#1 \begin{cases} #2 &
+\text{#3}\\ #4 &\text{#5}\\ #6 &\text{#7} \end{cases}   }
+
+% Fractions
+\newcommand{\foh}{\frac{1}{2}}
+\newcommand{\foq}{\frac{1}{4}}
+\newcommand{\fon}{\frac{1}{n}}
+
+% Blackboard Letters
+\newcommand{\R}{\ensuremath{\mathbb{R}}}
+\newcommand{\C}{\ensuremath{\mathbb{C}}}
+%\newcommand{\Z}{\ensuremath{\mathbb{Z}}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\F}{\mathbb{F}}
+%\newcommand{\W}{\mathbb{W}}
+\newcommand{\sph}{\mathbb{S}}
+
+% Greek Letters
+\newcommand{\ga}{\alpha}
+\newcommand{\gb}{\beta}
+\newcommand{\gep}{\epsilon}
+\newcommand{\vgep}{\varepsilon}
+\newcommand{\gth}{\theta}
+\newcommand{\vgth}{\vartheta}
+\newcommand{\gk}{\kappa}
+\newcommand{\gl}{\lambda}
+\newcommand{\gs}{\sigma}
+
+\newcommand{\bgb}{\bs{\gb}}
+
+% Matrix
+\newcommand{\mattwo}[4]
+{\left(\begin{array}{cc}
+                        #1  & #2   \\
+                        #3 &  #4
+                          \end{array}\right) }
+\newcommand{\matthree}[9]
+{\left(\begin{array}{ccc}
+                        #1  & #2 & #3  \\
+                        #4 &  #5 & #6 \\
+                        #7 & #8 & #9 \\
+                          \end{array}\right) }
+
+% Linear Algebra
+\newcommand{\col}{\mathrm{col} \,}
+\newcommand{\im}{\mathrm{im} \,}
+\newcommand{\rank}{\mathrm{rank} \,}
+\newcommand{\trace}{\mathrm{tr} \,}
+\newcommand{\laspan}{\mathrm{span} \,}
+\newcommand{\iprod}[2]{\big\langle #1, \, #2 \big\rangle}
+\newcommand{\tr}{\mathrm{T}}
+\newcommand{\diag}{\mathrm{diag}}
+\newcommand{\Id}{\bs{I}}
+
+% Calculus
+\newcommand{\dd}[2]{\frac{d#1}{d#2}}
+\newcommand{\pdd}[2]{\frac{\partial #1}{\partial #2}}
+
+% Operators
+\newcommand{\Ad}{\mathrm{Ad}}
+\newcommand{\Lie}[1]{\mathrm{Lie}(#1)}
+\newcommand{\sign}{\mathrm{sign} \,}
+\newcommand{\supp}{\mathrm{supp} \,}
+
+% Geometry
+\newcommand{\del}[2]{\nabla_{#1}#2}
+\newcommand{\multi}[1]{\underset{\raisebox{2pt}[0pt]{$\rightharpoondown$}}{#1}}
+\newcommand{\multis}[1]{\underset{\raisebox{2pt}[2pt]{$\scriptscriptstyle\rightharpoondown$}}{#1}}
+
+% Probability/Statistics
+\newcommand{\Prb}{\mathrm{P}}
+\newcommand{\E}{\mathrm{E}}
+\newcommand{\Ehat}{\hat{\E}}
+\newcommand{\Ex}{\mathbb{E}}
+\newcommand{\bias}{\mathrm{bias}}
+\newcommand{\var}{\mathrm{var}}
+\newcommand{\cov}{\mathrm{cov}}
+\newcommand{\cid}{\overset{d}{\to}}
+\newcommand{\X}{\bs{X}}
+\newcommand{\Y}{\bs{Y}}
+\newcommand{\SE}{\mathrm{SE}}
+
+% Distributions
+\newcommand{\Bern}{\mathrm{Bernoulli}}
+\newcommand{\Poisson}{\mathrm{Poisson}}
+\newcommand{\Normal}{\mathrm{N}}
+\newcommand{\DGamma}{\mathrm{Gamma}}
+\newcommand{\Unif}{\mathrm{Uniform}}
+
+% Math operators
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+% Formatting
+\newcommand{\bs}[1]{\boldsymbol{#1}}
+
+% Graphics
+\newcommand{\grapher}[2]{\centerline{\includegraphics[width=#2]{#1}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Code Environments
+
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\usepackage[normalem]{ulem}
+\usepackage{algpseudocode}
+\usepackage{graphicx} 
+\usepackage{fancyvrb} 
+\lstnewenvironment{Rcode}{\lstset{frame=tb,% setup listings 
+        language=R,% set programming language 
+        basicstyle=\small\ttfamily,% basic font style 
+        keywordstyle=\bfseries\color{blue},% keyword style 
+        commentstyle=\ttfamily\itshape\color{dkgreen},% comment style 
+          stringstyle=\color{mauve},
+        numbers=left,% display line numbers on the left side 
+        numberstyle=\scriptsize,% use small line numbers 
+        numbersep=10pt,% space between line numbers and code 
+        tabsize=3,% sizes of tabs 
+        showstringspaces=false,% do not replace spaces in strings by a certain character 
+        captionpos=b,% positioning of the caption below 
+        breaklines=true,% automatic line breaking 
+        escapeinside={(*}{*)},% escaping to LaTeX 
+        fancyvrb=true,% verbatim code is typset by listings 
+        extendedchars=false,% prohibit extended chars (chars of codes 128--255) 
+        literate={"}{{\texttt{"}}}1{<-}{{$\leftarrow$}}1{<<-}{{$\twoheadleftarrow$}}1 
+        {~}{{$\sim$}}1{<=}{{$\le$}}1{>=}{{$\ge$}}1{!=}{{$\neq$}}1{^}{{$^\wedge$}}1,% item to replace, text, length of chars 
+        alsoletter={.<-},% becomes a letter 
+        alsoother={$},% becomes other 
+        otherkeywords={!=, ~, $, *, \&, \%/\%, \%*\%, \%\%, <-, <<-, /},% other keywords 
+        deletekeywords={c}% remove keywords }}{}
+        }
+        }{}
+
+\numberwithin{equation}{section}
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% MACROS
+
+\newcommand{\tp}{\mathrm{T}}
+
+\newcommand{\z}{\bs{z}}
+\newcommand{\x}{\bs{x}}
+\newcommand{\w}{\bs{w}}
+\newcommand{\inst}{\bs{u}}
+\newcommand{\instc}{u}
+
+\newcommand{\pz}{{p_{\z}}}
+\newcommand{\pw}{{p_{\w}}}
+\newcommand{\px}{{p_{\x}}}
+\newcommand{\pinst}{{p_{\inst}}}
+
+\newcommand{\reg}{\gth}
+\newcommand{\eft}{\gth}
+\newcommand{\efthat}{\hat{\eft}}
+\newcommand{\nuis}{\bs{\gamma}}
+\newcommand{\sdh}{\gs_h}
+\newcommand{\sdv}{\gs_v}
+\newcommand{\covhv}{\gs_{hv}}
+
+\newcommand{\efc}{\bs{\gamma}}
+\newcommand{\W}{\bs{W}}
+\newcommand{\Z}{\bs{Z}}
+\newcommand{\erry}{\gep}
+\newcommand{\pd}{\partial}
+
+\newcommand{\gbt}{\bs{\gb}}
+\newcommand{\argb}{\bs{b}}
+
+%\newcommand{\fix}[1]{\smash{\underset{{\bs{-}}}{#1}}}
+%\newcommand{\fix}[1]{\underline{#1}}
+
+
+\noindent David Gold \hfill \today \\
+STAT 572 --- Questions for mentor (Adrian Dobra) \vspace{.2em}\hrule
+\vspace{1em}
+
+\noindent The following questions concern the motivation and examples that \cite{BCH11} give for their condition ASM on page 3-7. We recall their set-up. Suppose for $i\in1,\ldots,n$ that
+\benn
+	y_i \ = \ f(\z_i) + \gep_i,
+\eenn
+where $y_i \in \R, \z_i\in\R^\pz$, and $\gep_i \sim_{iid} \Normal(0,\gs^2)$. Let $\x_i = P(\z_i) = \big(P_1(\z_i),\ldots,P_\px(\z_i)\big) \in \R^\px$ be a vector-valued transformation of $\z_i$. Say that $f(\z)$ is \emph{approximately sparse} if there exists a $\gbt \in\R^{\px}$ so that $s = \|\gbt\|_0$ (that is, $s$ is the number of non-zero elements of $\gbt$) and 
+\benn
+	r_i \ := \ f(\z_i) - \langle \x_i, \gbt \rangle
+\eenn
+satisfy
+\begin{enumerate}
+\itemsep0em
+	\item  $c_s := \left[n^{-1}\sum_i (r_i)^2\right]^{1/2} \leq K\gs\sqrt{s/n}$ for a universal constant $K$;
+	\item  $s \equiv s(n) = o(n/\log\px)$. 
+\end{enumerate}
+(All sums taken over the index $i$ are evaluated over $i\in1,\ldots,n$ unless noted otherwise.)
+
+\newcommand{\gd}{\delta}
+\vspace{1em}
+\noindent \textbf{1.}\quad The authors mention one can identify such a $\gbt$ as the solution to the optimization problem
+\be\label{eq1}
+	\bgb \ \in \ \argmin_{\argb\,\in\,\R^{\px}} \Big\{\underbrace{\fon\sum_i \big(\underbrace{f(\z_i) - \langle\x_i,\argb\rangle}_{r_i}\big)^2}_{c_s^2} + \gs^2\|\argb\|_0/n \Big\} \,.
+\ee
+They mention that, in ``common nonparametric problems'', the optimal solution $\gbt$ balances the order of ``approximation error'' $c_s^2$ and the order of the ``estimation error'' $\gs^2\|\argb\|_0/n$. Why is this the case? Is it actually a condition that the solution must satisfy this ``balancing'', or is this a restriction imposed by the authors? If the former, where can one find a reference for this phenomenon?
+
+\vspace{1em}
+\noindent\textbf{2.}\quad One example of a ``nonparametric problem'' that \cite{BCH11} study (page 6-7) is that of an $f$ for which a Fourier expansion $f(\z) = \sum_{j=1}^{\infty} \gd_j P_j(\z_i)$, where the $P_j(\z)$, $j\in\N$ are orthonormal basis functions on $\mathcal{Z} = [0,1]^{\pz}$ and the $\z_i$ are assumed distributed uniformly on $\mathcal{Z}$. If one assumes that the Fourier coefficients decay as $\gd_j \propto j^{-\nu}$, where $\nu$ is a smoothness measure of $f$, and one considers $\gbt = (\gd_j)_{j=1}^{d}$ and $\x(\z) = (P_1(\z), \ldots, P_d(\z))$, then $c_s$ as defined above satisfies
+\benn
+	c_s \ = \ O_P(\sqrt{\E[f(\z) - \langle \x, \gbt\rangle]})\,, \qquad\qquad \sqrt{\E[f(\z) - \langle \x, \gbt\rangle]} \ \lesssim \ d^{1/2-\nu} \,.
+\eenn
+(I have their $K$ to a $d$ since the authors use $K$ previously for the different, conflicting purpose identified above.) The authors state that ``Balancing the order $d^{1/2-\nu}$ of approximation error with the order $\sqrt{d/n}$ of the estimation error gives the oracle-rate-optimal number of series terms $s = d \propto n^{1/(2\nu)}$. My first question is: is this an instance where the authors are citing the fact that the optimal solution to \eqref{eq1} must balance the orders of the two terms, or are they imposing that restriction themselves and then deriving conditions on the relevant quantities from that self-imposed restriction? My second question is: is it even true that $\gbt$ in this instance satisfies \eqref{eq1}? If so, how does one show this? Finally, why do the authors consider random $\z_i$ in this example but explicitly consider the $\z_i$ (and hence the $\x_i$) fixed in their definition of condition ASM (essentially the definition of approximate sparsity above) on page 3? Is this purposeful, or sloppiness? 
+
+
+
+
+
+
+\bibliographystyle{plain}
+\bibliography{../references}
+%\bibliography{pres_intro}
+
+
+
+\end{document}
