@@ -1,0 +1,510 @@
+\documentclass{uwstat572}
+
+%%\setlength{\oddsidemargin}{0.25in}
+%%\setlength{\textwidth}{6in}
+%%\setlength{\topmargin}{0.5in}
+%%\setlength{\textheight}{9in}
+
+\renewcommand{\baselinestretch}{1.5} 
+
+\usepackage{amsmath,amsfonts,amsthm,amssymb,amscd}
+%\usepackage[margin=1.15in]{geometry}
+\usepackage{mathrsfs}
+\usepackage{bbm}
+\usepackage{bm}
+\usepackage{mathtools}
+\usepackage{cancel}
+\usepackage{listings}
+\usepackage{booktabs}
+
+% Begin/End
+\newcommand{\be}{\begin{equation}}
+\newcommand{\ee}{\end{equation}}
+\newcommand{\benn}{\begin{equation*}}
+\newcommand{\eenn}{\end{equation*}}
+
+% Theorem-like Environments
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{conj}[thm]{Conjecture}
+\newtheorem{cond}[thm]{Condition}
+\newtheorem{cor}[thm]{Corollary}
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{exa}[thm]{Example}
+\newtheorem{exe}[thm]{Exercise}
+
+\newtheorem{que}[thm]{Question}
+\newtheorem{prob}[thm]{Problem}
+\newtheorem{cla}[thm]{Claim}
+\newtheorem{esti}[thm]{Estimation}
+\newtheorem{assu}[thm]{Assumption}
+
+\theoremstyle{definition}
+\newtheorem{defi}[thm]{Definition}
+
+\theoremstyle{remark}
+\newtheorem{rek}[thm]{Remark}
+
+% Two-Case and Three-Case Definitions
+\newcommand{\twocase}[5]{#1 \begin{cases} #2 & \text{#3}\\ #4
+&\text{#5} \end{cases}   }
+\newcommand{\threecase}[7]{#1 \begin{cases} #2 &
+\text{#3}\\ #4 &\text{#5}\\ #6 &\text{#7} \end{cases}   }
+
+% Fractions
+\newcommand{\foh}{\frac{1}{2}}
+\newcommand{\foq}{\frac{1}{4}}
+\newcommand{\fon}{\frac{1}{n}}
+
+% Blackboard Letters
+\newcommand{\R}{\ensuremath{\mathbb{R}}}
+\newcommand{\C}{\ensuremath{\mathbb{C}}}
+%\newcommand{\Z}{\ensuremath{\mathbb{Z}}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\F}{\mathbb{F}}
+%\newcommand{\W}{\mathbb{W}}
+\newcommand{\sph}{\mathbb{S}}
+
+% Greek Letters
+\newcommand{\ga}{\alpha}
+\newcommand{\gb}{\beta}
+\newcommand{\gep}{\epsilon}
+\newcommand{\vgep}{\varepsilon}
+\newcommand{\gth}{\theta}
+\newcommand{\vgth}{\vartheta}
+\newcommand{\gk}{\kappa}
+\newcommand{\gl}{\lambda}
+\newcommand{\gs}{\sigma}
+
+\newcommand{\bgb}{\bs{\gb}}
+
+% Matrix
+\newcommand{\mattwo}[4]
+{\left(\begin{array}{cc}
+                        #1  & #2   \\
+                        #3 &  #4
+                          \end{array}\right) }
+\newcommand{\matthree}[9]
+{\left(\begin{array}{ccc}
+                        #1  & #2 & #3  \\
+                        #4 &  #5 & #6 \\
+                        #7 & #8 & #9 \\
+                          \end{array}\right) }
+
+% Linear Algebra
+\newcommand{\col}{\mathrm{col} \,}
+\newcommand{\im}{\mathrm{im} \,}
+\newcommand{\rank}{\mathrm{rank} \,}
+\newcommand{\trace}{\mathrm{tr} \,}
+\newcommand{\laspan}{\mathrm{span} \,}
+\newcommand{\iprod}[2]{\big\langle #1, \, #2 \big\rangle}
+\newcommand{\tr}{\mathrm{T}}
+\newcommand{\diag}{\mathrm{diag}}
+\newcommand{\Id}{\bs{I}}
+
+% Calculus
+\newcommand{\dd}[2]{\frac{d#1}{d#2}}
+\newcommand{\pdd}[2]{\frac{\partial #1}{\partial #2}}
+
+% Operators
+\newcommand{\Ad}{\mathrm{Ad}}
+\newcommand{\Lie}[1]{\mathrm{Lie}(#1)}
+\newcommand{\sign}{\mathrm{sign} \,}
+\newcommand{\supp}{\mathrm{supp} \,}
+
+% Geometry
+\newcommand{\del}[2]{\nabla_{#1}#2}
+\newcommand{\multi}[1]{\underset{\raisebox{2pt}[0pt]{$\rightharpoondown$}}{#1}}
+\newcommand{\multis}[1]{\underset{\raisebox{2pt}[2pt]{$\scriptscriptstyle\rightharpoondown$}}{#1}}
+
+% Probability/Statistics
+\newcommand{\Prb}{\mathrm{P}}
+\newcommand{\E}{\mathrm{E}}
+\newcommand{\Ehat}{\hat{\E}}
+\newcommand{\Ex}{\mathbb{E}}
+\newcommand{\bias}{\mathrm{bias}}
+\newcommand{\var}{\mathrm{var}}
+\newcommand{\cov}{\mathrm{cov}}
+\newcommand{\cid}{\overset{d}{\to}}
+\newcommand{\X}{\bs{X}}
+\newcommand{\Y}{\bs{Y}}
+\newcommand{\SE}{\mathrm{SE}}
+
+% Distributions
+\newcommand{\Bern}{\mathrm{Bernoulli}}
+\newcommand{\Poisson}{\mathrm{Poisson}}
+\newcommand{\Normal}{\mathrm{N}}
+\newcommand{\DGamma}{\mathrm{Gamma}}
+\newcommand{\Unif}{\mathrm{Uniform}}
+
+% Math operators
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+% Formatting
+\newcommand{\bs}[1]{\boldsymbol{#1}}
+
+% Graphics
+\newcommand{\grapher}[2]{\centerline{\includegraphics[width=#2]{#1}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Code Environments
+
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\usepackage[normalem]{ulem}
+\usepackage{algpseudocode}
+\usepackage{graphicx} 
+\usepackage{fancyvrb} 
+\lstnewenvironment{Rcode}{\lstset{frame=tb,% setup listings 
+        language=R,% set programming language 
+        basicstyle=\small\ttfamily,% basic font style 
+        keywordstyle=\bfseries\color{blue},% keyword style 
+        commentstyle=\ttfamily\itshape\color{dkgreen},% comment style 
+          stringstyle=\color{mauve},
+        numbers=left,% display line numbers on the left side 
+        numberstyle=\scriptsize,% use small line numbers 
+        numbersep=10pt,% space between line numbers and code 
+        tabsize=3,% sizes of tabs 
+        showstringspaces=false,% do not replace spaces in strings by a certain character 
+        captionpos=b,% positioning of the caption below 
+        breaklines=true,% automatic line breaking 
+        escapeinside={(*}{*)},% escaping to LaTeX 
+        fancyvrb=true,% verbatim code is typset by listings 
+        extendedchars=false,% prohibit extended chars (chars of codes 128--255) 
+        literate={"}{{\texttt{"}}}1{<-}{{$\leftarrow$}}1{<<-}{{$\twoheadleftarrow$}}1 
+        {~}{{$\sim$}}1{<=}{{$\le$}}1{>=}{{$\ge$}}1{!=}{{$\neq$}}1{^}{{$^\wedge$}}1,% item to replace, text, length of chars 
+        alsoletter={.<-},% becomes a letter 
+        alsoother={$},% becomes other 
+        otherkeywords={!=, ~, $, *, \&, \%/\%, \%*\%, \%\%, <-, <<-, /},% other keywords 
+        deletekeywords={c}% remove keywords }}{}
+        }
+        }{}
+
+\numberwithin{equation}{section}
+\begin{document}
+\nocite{*}
+\newcommand{\note}[1]{\textcolor{red}{[NOTE: #1]}}
+\newcommand{\todo}[1]{\textcolor{red}{[TO-DO: #1]}}
+
+\begin{center}
+  {\LARGE Approximately Sparse Econometric Models}\\\ \\
+  {David Gold \\ 
+    Department of Statistics, University of Washington Seattle, WA, 98195, USA
+  }
+\end{center}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% MACROS
+
+\newcommand{\tp}{\mathrm{T}}
+
+\newcommand{\z}{\bs{z}}
+\newcommand{\w}{\bs{w}}
+\newcommand{\inst}{\bs{u}}
+\newcommand{\instc}{u}
+
+\newcommand{\pz}{{p_{\z}}}
+\newcommand{\pw}{{p_{\w}}}
+\newcommand{\pinst}{{p_{\inst}}}
+
+\newcommand{\reg}{\gth}
+\newcommand{\eft}{\gth}
+\newcommand{\efthat}{\hat{\eft}}
+\newcommand{\nuis}{\bs{\gamma}}
+\newcommand{\sdh}{\gs_h}
+\newcommand{\sdv}{\gs_v}
+\newcommand{\covhv}{\gs_{hv}}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% INTRODUCTION
+
+\section{Introduction}
+
+
+An important objective of econometrics research is to conduct inference for the effect of a treatment variables on some economic response variable. In general, the value that the treatment takes for a given observation is not prescribed by the analyst. The relationship between the treatment and response may therefore be subject to \emph{confounding}. That is, the distribution of the response given a \emph{hypothetical intervention} in which treatment levels are prescribed by the analyst may differ from the distribution of the response given a natural distribution of treatments. Insofar as the effect of interest is specified in terms of the former distribution, the aforementioned discrepancy can induce bias in estimators derived from the latter distribution. In turn, statistical methods that address bias due to confounding are particularly relevant to econometrics studies. Two such methods are (i) the \emph{method of instrumental variables (IV)} and (ii) inference methods for \emph{partially linear (PL) models}.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% CONFOUNDING
+
+\subsection{Confounding}\label{sec:conf}
+\newcommand{\efc}{\bs{\gamma}}
+\newcommand{\W}{\bs{W}}
+\newcommand{\Z}{\bs{Z}}
+\newcommand{\erry}{\gep}
+\newcommand{\pd}{\partial}
+
+In this section, we briefly illustrate how confounding bias arises from the confluence of two factors: (i) the specification of a parameter of interest in terms of a hypothetical intervention in which treatment is assigned at the discretion of the analyst and (ii) the difference between such an intervention and actual circumstances. Let $X, Y$ denote treatment and response variables, respectively, and suppose that the true data-generating mechanism of interest is
+\be\label{eq:conf1}
+	\E[Y\,|\,x, \w] \ = \ \gb x + f(\w) \,, % + \gep\,, 
+\ee
+where $\W\in\R^\pw$ are further covariates that influence $Y$. One possible quantity of interest is $\eft = \pdd{}{x}\E[Y\,|\,x]$, where the reference population is considered under a hypothetical intervention in which $X$ is set to $x$ at the discretion of the analyst. Given that, under such a hypothetical intervention, assignment of the treatment $X$ is independent of $\W$, the parameter of interest $\eft$ is equal to $\gb$. However, under actual circumstances, $X$ may be associated with $\W$ and measurements of the latter may be unavailable. In such cases, estimating $\eft$ by na\"ively fitting the model $\E[Y\,|\,x] = \gb^\dagger x$ incurs a well-known bias that, in general, is not alleviated by asymptotics.
+ 
+The method of instrumental variables addresses the foregoing issues by introducing \emph{instrumental variables} $\Z$ associated with $X$ through the conditional mean function $\E[X\,|\,\z]$ but otherwise unassociated with the response $Y$. In turn, $X$ is allowed to be \emph{endogenous} --- that is, to have nontrivial covariance with the response error. The endogeneity of $X$ reflects the influence of unmeasured confounders. Intuitively, the method of instrumental variables circumvents confounding bias by studying the variation in the response relative to the ``part'' of variation in the treatment that is due only to the effect of the instruments. 
+
+%Whether it is reasonable to assume that proposed instruments for a given treatment effect satisfy the foregoing conditions depends on theoretical or scientific knowledge of the mechanism or population under study. 
+%An example is \cite{AK91}, who apply the method of instrumental variables to estimate of the effect of years of schooling on income later in life. Prima facie, it is possible that unmeasured variables that reflect innate academic ability may be associated with both years of schooling and adult income.  
+
+The partially linear model \ref{eq:conf1} is relevant when the analyst is reasonably confident that potential confounders $\W$ are measured but lacks a priori knowledge that would justify restrictions, such as linearity, on the functional relationship between the response $Y$ and $\W$. In such cases the analyst may reasonably assume the $X$ are not endogenous and avail herself of more general semiparametric methods.
+
+Apart from the foregoing motivation, the present essay focuses exclusively on the statistical properties of estimators $\efthat$ derived from the IV and PL models. We refer the reader to \cite[Chapter 5]{P09} and \cite{AK01} for deeper discussions of how IV models in particular come to bear on causal inference. 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% 
+\subsection{Series estimation}\label{ss:se}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% INFERENCE
+
+\subsection{Inference}
+
+Inference for the treatment effect in an IV model proceeds by fitting the observed responses $Y_i$ to estimates $\Ehat[X_i\,|\,\z_i]$. In linear IV models, the simplest implementation of this procedure is \emph{Two-Stage Least Squares (2SLS)} regression of the treatment $X$ on the instruments $\Z$ in the first stage and $Y$ on the estimates $\Ehat[X\,|\,\z]$ in the second stage. Small and large sample properties of the 2SLS have been extensively researched since the 1950s, particularly to the end of alleviating the bias incurred by introducing ``many instruments'' --- that is, letting the number $\pz$ of instruments grow with the sample size $n$. Early work in this vein concerned the \emph{Limited Information Maximum Likelihood (LIML) estimator} \todo{comment on LIML -- I'm still working through the literature on this}. 
+
+\cite{F77} studies a modification of the LIML estimator that has finite moments and bias of order of $n^{-2}$ \todo{comment on issues concerning standard error estimates of Fuller estimator}. \cite{B94} proposes similarly modified estimators and obtains corrected standard errors for asymptotic approximations under a particular sequence of model parameters in which $\pz$ may satsify $\lim_{n\to\infty} \pz/n > 0$ --- a condition that entails inconsistency of the 2SLS estimator under reasonable assumptions. More recently, \cite{HHN08} extend the result of \cite{B94} to the case of non-Gaussian errors. \cite{BW11} give an accessible survey of approximations to the finite sample bias of the 2SLS estimator in the case of a single endogenous covariate $X$. 
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% METHODS
+\renewcommand{\d}{\bs{d}}
+\newcommand{\dhat}{\hat{\d}}
+\newcommand{\db}{\d_{\regb}}
+\renewcommand{\u}{\bs{u}}
+\newcommand{\x}{\bs{x}}
+\newcommand{\y}{\bs{y}}
+\newcommand{\U}{\bs{U}}
+
+\newcommand{\px}{p_{\x}}
+\newcommand{\pu}{p_{\u}}
+\newcommand{\fhat}{\hat{f}}
+\newcommand{\regb}{\bs{\gb}}
+\newcommand{\regbh}{\hat{\regb}}
+\newcommand{\fb}{f_{\regb}}
+\newcommand{\fbn}{f_{\regb, n}}
+\newcommand{\fbhat}{\hat{\fb}}
+\newcommand{\rem}{\bs{r}}
+\newcommand{\remc}{r}
+\newcommand{\rfb}{r_{\famb}}
+\newcommand{\rc}{c_r}
+\newcommand{\rb}{r_{\regb}}
+\newcommand{\rbn}{r_{\regb,n}}
+\newcommand{\rfs}{r_{\fams}}
+\newcommand{\Xs}{\mathcal{X}}
+\newcommand{\Zs}{\mathcal{Z}}
+\newcommand{\Fs}{\mathcal{F}}
+\newcommand{\Bs}{\mathcal{B}}
+\newcommand{\famb}{\Fs_\Bs}
+\newcommand{\fams}{\Fs_\sb}
+\newcommand{\Sb}{S}
+\newcommand{\Us}{\mathcal{U}}
+\renewcommand{\sb}{s}
+\newcommand{\gramhat}{\hat{\bs{\Sigma}}}
+\newcommand{\tune}{\lambda}
+\newcommand{\ersi}{\gep_i}
+\newcommand{\inn}{\in[n]}
+\newcommand{\sd}{\gs}
+
+\section{Methods}
+
+Consider an $n$-indexed sequence of models
+\be\label{eq:mod1}
+	y_i \ = \ d_i + \ersi\,, \qquad d_i \ = \ f(\u_i)
+\ee
+where $y_i \in \R$ is a response, $\u_i = (u_1,\ldots,u_{\pu}) \in \Us \subseteq \R^{\pu}$ are exposures, $\ersi \sim \Normal(0,\sd^2)$ for each $i\in[n]$ and $\sd \equiv \sd_n$.  Our objective is accurate estimation of the unknown regression function $f \equiv f_n : \Us \to \R$. 
+
+In section \ref{ss:se}, we suggested that, for suitable $f$ and a sufficiently comprehensive expansion $\z_i := (z^j(\u_i))_{j\in[\pz]} \in \Zs \subseteq \R^{\pz}$ of $\u_i$, the function $f$ may be well approximated by some $\fb \equiv \fbn : \Zs \to \R$ belonging to a family $\famb := \{ f_b:b\in\Bs\}$ indexed by $\Bs \equiv \Bs_n \subseteq \R^{p_\Bs}$. If $\famb$ is suitably restricted, then a natural estimator of $\fb$ is $\fbhat := f_{\regbh}$, where $\regbh \equiv \regbh_n(\y, \Z)$ is an estimator of $\regb$ fit to the model $\E[y_i] = \fb(\z_i)$ given the data $\y = (y_i)_{\inn}, \Z = (\z^j)_{j\in[\pz]}$. However, the aforementioned model is correct only up to the approximation errors $\remc_i := f(\u_i) - \fb(\z_i)$ of $\fb$. Let $\rb$ denote the rate (up to order) of the scaled $\ell_2$ approximation error of $\fb$, so that $\rem = (\remc_i)_{i\in[n]}$ satisfies $\|\rem\|_2/\sqrt{n} \lesssim \rb$. Given a sequence of such estimators $\regbh$ and an approximation rate $\rb$, it is natural to ask: (i) how well do the $\regbh$ estimate $\regb$ despite such approximation error; (ii) how well do the resultant $\fbhat$ estimate $f$? 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% APPROXIMATE SPARSITY
+\subsection{Approximate sparsity}
+
+%An answer for linear $\fb$ that depend sparsely on $\z$ is available. Let $\rfb \equiv \rfb(\rb, n)$ denote the rate of prediction error for $\regbh$ given the approximation rate $\rb$, so that $\|\regbh - \regb\|_{\gramhat} \lesssim_\Prb \rfb$. If the family of approximating functions is taken to be 
+For linear $\fb$ that depend sparsely on their arguments, answers to the foregoing questions are available. If, for a sequence $\sb \equiv \sb_n$ and the approximation rate $\rb = \sd\sqrt{\sb/n}$, there exists a sequence of $\fb$ each belonging to the respective family
+%\be\label{def:fams}
+\benn
+	\fams \ := \ \{ f_{\bs{b}}: \z \mapsto \langle \z, \bs{b}\rangle \,:\, \bs{b} \in \R^{\pz},\, \|\bs{b}\|_0 \leq \sb \} \,,
+\eenn
+then, under forthcoming conditions and a suitable choice of $\tune$, the Lasso estimator
+\benn
+	\regbh \ \in \ \argmin_{\bs{b}\,\in\,\R^{\pz}} \big\{ \|\y - \Z\bs{b}\|_2^2/n + \tune\|\bs{b}\|_1 \big\}
+\eenn
+satisfies $\|\regbh - \regb\|_{\gramhat} \lesssim_\Prb \sd\sqrt{s\log(\pz\vee n)/n}$ and hence obtains a prediction rate of order $\rb\sqrt{\log(\pz\vee n)}$. The estimator $\dhat := (\fbhat(\z_i))_{\inn}$ of $\d := (d_i)_{\inn}$ in turn satisfies
+\begin{align}
+	\| \dhat -\d \|_2 \ & \leq \  \|\dhat - \db\|_2 + \| \d - \db \|_2 \nonumber\\
+	& = \ \sqrt{n}\|\regbh - \regb\|_{\gramhat} + \|\rem\|_2 \ \lesssim_\Prb \ \sd\sqrt{\sb\log(\pz\vee n)} \,,
+\end{align}
+where $\db := (\fb(\z_i))_{\inn}$. Under the typical assumptions that $\sd = O(1)$ and $\sb = o(n/\log\pz)$, the right-hand side above is~$o(\sqrt{n})$, which entails that $\dhat$ achieves ``consistency'' in (scaled) $\ell_2$-norm. The foregoing considerations suggest the following characterization of such models.
+
+\begin{defi}[Approximate sparsity] Given a sequence of models of the form \eqref{eq:mod1} and transformations $\z = \z(\u) \in \R^{\pz(n)}$, where the $\z^j$ are considered fixed and normalized so that $\|\z^j\|_2 = \sqrt{n}$, we say that the regression functions $f$ are \emph{approximately sparse} if there exist a sequence of $\sb\equiv \sb(n)$ satisfying $\sb = o(n/\log\pz)$ and a sequence of $\fb \equiv \fb(n) \in \fams$ such that the rate of approximation error of $\fb$ for $f$ is $\rb = \sd\sqrt{\sb/n}$.
+\end{defi}
+
+\begin{rek} That a sequence of regression functions is approximately sparse is equivalent to that Condition ASM of \cite{BCH11} holds. Our choice of presentation is motivated by concerns for clarity of the order of logical quantification over the different model parts. 
+\end{rek}
+
+
+The approximation scheme devised above is ... The analyst may wish to expand to an arbitrary number of approximation functions $z_j$ under the assumption that few such $z_j$ will contribute non-trivially to $\fbhat$. That is, the analyst may suppose that $\regb$ is $\sb$-\emph{sparse} --- that is, $\Sb := \supp \regb$ satisfies $|\Sb| \leq \sb$ for some $\sb \ll \dim(\regb)$. If $S$ were known, the analyst could ...   
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% 
+\subsection{Lasso estimation}
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%
+\subsection{Inference for IV models}
+\newcommand{\regt}{\gth}
+\newcommand{\regg}{\bs{\gamma}}
+\newcommand{\rega}{\bs{\ga}}
+\newcommand{\regahat}{\hat{\rega}}
+\newcommand{\erfi}{v_i}
+\newcommand{\erfc}{v}
+\newcommand{\ersc}{\gep}
+\newcommand{\sds}{\sd_\ersc}
+\newcommand{\sdf}{\sd_\erfc}
+\renewcommand{\a}{\bs{a}}
+\newcommand{\ahat}{\hat{\a}}
+\newcommand{\sdfs}{\sd_{\erfc\ersc}}
+\newcommand{\xinst}{\x^\dagger}
+\newcommand{\xinsti}{x_i^\dagger}
+\newcommand{\kp}{\otimes}
+\newcommand{\ainst}{\a^\dagger}
+\newcommand{\ainstkpt}{\a^{\dagger\kpt}}
+\newcommand{\En}{\mathbb{E}_n}
+\renewcommand{\rm}{\bs{\Delta}}
+\newcommand{\g}{\bs{g}}
+\renewcommand{\Q}{\bs{Q}}
+\newcommand{\Om}{\bs{\Omega}}
+\newcommand{\EEn}{\bar{\E}}
+\newcommand{\kpt}{\kp2}
+
+
+Consider an $n$-indexed sequence of IV models given by
+\benn
+	y_i \ = \ x_i\regt + \langle\w_i, \regg\rangle + \ersi\,, \qquad x_i \ = \ d_i(\u_i) + \erfi \,,
+\eenn
+where $y_i \in \R$ is a response, $x_i \in \R$ is an endogenous treatment variable, $\w_i\in\R^{\pw}$ are exogenous ``control'' variables, $\u_i \in \R^{\pz}$ are instrumental variables that may intersect non-trivially with $\w_i$, $d$ is an unknown regression function, and the errors $\erfi, \ersi$ satisfy
+\benn
+	\begin{pmatrix} \erfi \,|\, \u_i \\[-.5em] \ersi \,|\, \u_i \end{pmatrix} \ \sim \ \Normal\left(\bs{0}, \begin{pmatrix} \sdf^2 & \sdfs \\[-.5em] \sdfs & \sds^2 \end{pmatrix} \right)\,.
+\eenn
+Our objective is efficient inference for $\regt$. For brevity, write $\a_i := (x_i, \w_i), \rega := (\regt, \regg)$ so that $y_i = \langle \a_i, \rega \rangle + \ersi$. If $\xinst \equiv (\xinsti)_{\inn}$ is a suitable instrument for $\x \equiv (x_i)_{\inn}$, then the standard IV estimator is given by
+\benn
+	\regahat \ = \ (\En[\ainst_i \kp \a_i])^{-1}\En[\a_i y_i] 
+\eenn 
+and, under ``standard conditions,'' satisfies
+\benn
+	\sqrt{n}(\regahat - \rega) \ = \ \g + \rm\,, \qquad \g \ \sim \ \Normal(\bs{0}, \Q^{-1}\Om\Q^{-1\tp})\,,
+\eenn
+where $\Q := \EEn[\ainst_i \kp \a_i]$, $\Om := \sds^2\EEn[\ainstkpt_i]$, and $\rm$ satisfies $\|\rm\|_\infty = o_{\Prb}(1)$. If $\xinsti = \E[x_i\,|\,\u_i] = d_i$, then $\E[\xinsti x_i] = \E[d_i^2 + d_i\erfi] = \E[d_i^2]$, in which case $\Q = \Om/\sds^2$ and hence
+\benn
+	\var(\g) \ = \ \sds^2\Q^{-1} \ = \ \sds^2\big(\EEn\big[ \E[\a_i\,|\,\u_i]^{\kpt} \big]\big)^{-1} \,,
+\eenn
+the semiparametric efficiency bound for estimating $\rega$. \todo{this exegesis is from \cite{BCCH12}; investigate further resources, e.g. \cite{A74}, \cite{C87}, \cite{N90}.} To achieve efficiency, we must therefore obtain consistent estimation of $d_i$ for $i\inn$ at a sufficiently fast rate. The following theorem of \cite{BCH11} demonstrates that, if the regression functions $d$ are approximately sparse, then the Lasso supports such estimation.  
+\begin{thm}[{\cite[Theorem 3]{BCH11}}]
+Let ... be distributed according to ... Suppose that: (i) the regression functions $d$ are approximately sparse;  (ii) $\sdf, \sds$ are ...; (iii) Condition SE holds for $\gramhat$; (iv) $\sb^2\log^2(\pz\vee n) = o(n)$. Then,
+%\benn
+%	
+%\eenn
+\end{thm}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%% Instrumental Variables Models
+%
+%\subsection{Instrumental Variables Models}
+%
+%The linear IV model characterizes potential confounding of $x$ and $y$ as a matter of dependence between $x$ and an error term. Formally, we suppose that the observations $(y_i, x_i, \w_i, \z_i)$ for $i\in[n] := \{1,\ldots,n\}$ are independent and identically distributed according to
+%\begin{align}
+%	y_i \ & = \ x_i\reg + \w^\tp\nuis + h_i \,, \\
+%	x_i \ & = \ d(\inst_i) + v_i \,,
+%\end{align}
+%where
+%%where $h_i, v_i$ are mean-zero error terms satisfying $\var(h_i) = \sdh^2$, $\var(v_i) = \sdv^2$, and $\cov(h_i, v_i) = \covhv$. Throughout the present essay we restrict our consideration to the case in which each $h_i, v_i$ are jointly distributed as multivariate Gaussian. 
+%\be
+%	\begin{pmatrix} h_i \\ v_i \end{pmatrix} \ \sim \ \Normal\left(\bs{0}, \begin{pmatrix} \sdh^2 & \covhv \\ \covhv & \sdv^2 \end{pmatrix}\right) \,.
+%\ee
+%Here, $\w_i = (w_{i1},\ldots,w_{i\pw})$ is a vector of \emph{control variables} and $\inst_i = (\instc_{i1},\ldots,\instc_{i\pinst})$ is a vector of \emph{instrumental variables} that typically contains $\w_i$ and additional covariates. 
+%
+%
+%
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%% 	PARTIALLY LINEAR MODELS
+%
+%\subsection{Partially Linear Models}
+%
+%The PL model assumes that potential confounders $\z$ of $x$ and $y$ are observed, but that the functional form by which each variable depends on $\z$ is unspecified. Formally, we suppose that the observations $(y_i, x_i, \z_i)$ are independent and identically distributed according to
+%\begin{align}
+%	y_i \ & = \ x_i\reg + g(\z_i) + h_i \,, \\
+%	x_i \ & = \ d(\z_i) + v_i \,,
+%\end{align}
+%where
+%\be
+%	\begin{pmatrix} h_i \\ v_i \end{pmatrix} \ \sim \ \Normal\left(\bs{0}, \begin{pmatrix} \sdh^2 & 0 \\ 0 & \sdv^2 \end{pmatrix}\right) \,.
+%\ee
+%
+%
+%
+%
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% REFERENCES
+
+\bibliographystyle{plainnat}
+\bibliography{../refs/refs}
+
+
+
+\end{document}
