@@ -21,7 +21,7 @@ Lambdahat <- function(X, t = .05, m = 100){
     as.numeric
 }
 
-.lambda <- function(sigma0hat, t, p) { 2 * c * sigma0hat * qnorm(1-(t/(2*p))) }
+.lambda <- function(sigma0hat, t = .05, p, c = 1.1) { 2 * c * sigma0hat * qnorm(1-(t/(2*p))) }
 
 # Compute sigma0hat using iterative procedure described in Algorithm 1, p35
 .sigma0hat <- function(Y, X, t = .05, c = 1.1, psi = .01, K = 100, nu = 1e-2){
