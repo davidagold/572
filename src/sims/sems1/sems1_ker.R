@@ -74,27 +74,29 @@ sim <- function(t){
   betahat_j <- numeric(R)
   beta0_j <- numeric(R)
   
-  for ( sigma0 in sigma0s ) {
+  for ( i in 1:2 ) {
     # Generate data
+    sigma0 <- sigma0s[i]
     X <- .X(n, p, Sigma)
     Y <- .Y(n, X, beta0, sigma0)
     
     # Lasso
-    r <- 0
+    r <- p * n_estimators * (i - 1)
+    
     lasso_fit <- glmnet(X, Y)
     sigma0hat <- .sigma0hat(Y, X)
     lambda <- .lambda(sigma0hat, t, p)
     L_betahat <- predict(lasso_fit, type = "coefficients", 
                          s = lambda, exact = TRUE, x = X, y = Y) %>% as.numeric
     
-    trial[r+1:(r+p)] <- t
-    sigma0_[r+1:(r+p)] <- sigma0
-    estimator[r+1:(r+p)] <- "Lasso"
-    j[r+1:(r+p)] <- 1:p
-    betahat_j[r+1:(r+p)] <- L_betahat
-    beta0_j[r+1:(r+p)] <- beta0
-    
-    # Post-Lasso
+    trial[(r+1):(r+p)] <- t
+    sigma0_[(r+1):(r+p)] <- sigma0
+    estimator[(r+1):(r+p)] <- "Lasso"
+    j[(r+1):(r+p)] <- 1:p
+    betahat_j[(r+1):(r+p)] <- L_betahat
+    beta0_j[(r+1):(r+p)] <- beta0
+
+    #Post-Lasso
     r <- r + p
     Shat <- which(L_betahat != 0)
     shat <- length(Shat)
@@ -109,24 +111,25 @@ sim <- function(t){
     }
     PL_betahat <- numeric(p)
     PL_betahat[Shat] <- coefficients(PL_fit)
-    
-    trial[r+1:(r+p)] <- t
-    sigma0_[r+1:(r+p)] <- sigma0
-    estimator[r+1:(r+p)] <- "Post-Lasso"
-    j[r+1:(r+p)] <- 1:p
-    betahat_j[r+1:(r+p)] <- PL_betahat
-    beta0_j[r+1:(r+p)] <- beta0
-    
+
+    trial[(r+1):(r+p)] <- t
+    sigma0_[(r+1):(r+p)] <- sigma0
+    estimator[(r+1):(r+p)] <- "Post-Lasso"
+    j[(r+1):(r+p)] <- 1:p
+    betahat_j[(r+1):(r+p)] <- PL_betahat
+    beta0_j[(r+1):(r+p)] <- beta0
+
     # CV Lasso
     r <- r + p
     cv_lasso_fit <- cv.glmnet(X, Y, alpha=1, nfolds=5)
+
+    trial[(r+1):(r+p)] <- t
+    sigma0_[(r+1):(r+p)] <- sigma0
+    estimator[(r+1):(r+p)] <- "CV_Lasso"
+    j[(r+1):(r+p)] <- 1:p
+    betahat_j[(r+1):(r+p)] <- as.numeric(coef(cv_lasso_fit, s = "lambda.min"))
+    beta0_j[(r+1):(r+p)] <- beta0
     
-    trial[r+1:(r+p)] <- t
-    sigma0_[r+1:(r+p)] <- sigma0
-    estimator[r+1:(r+p)] <- "CV_Lasso"
-    j[r+1:(r+p)] <- 1:p
-    betahat_j[r+1:(r+p)] <- as.numeric(coef(cv_lasso_fit, s = "lambda.min"))
-    beta0_j[r+1:(r+p)] <- beta0
   }
 
   data.frame(
