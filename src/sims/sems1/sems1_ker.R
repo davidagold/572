@@ -1,9 +1,47 @@
 # setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 
-# library(dplyr)
+library(dplyr)
+library(tidyr)
 library(MASS)
 library(mvtnorm)
 library(glmnet)
+library(flare)
+
+# Approximation of Lambda defined in eq (3.10), p8
+Lambdahat <- function(X, t = .05, m = 100){
+  n <- nrow(X)
+  g <- rnorm(n * m, 0, 1)
+  (do.call(rbind, replicate(100, X, simplify = FALSE)) * g) %>% 
+    { data.frame(i = rep(1:n, times=m), r = rep(1:m, each = n), .)} %>%
+    gather(X_j, X_ij, contains("X")) %>%
+    group_by(r, X_j) %>% 
+    summarize(sum_X_ij = sum(X_ij)) %>%
+    summarize(maxsum_X_ij = max(sum_X_ij)) %>%
+    summarize(q = quantile(maxsum_X_ij, 1-t)) %>% 
+    as.numeric
+}
+
+.lambda <- function(sigma0hat, t, p) { 2 * c * sigma0hat * qnorm(1-(t/(2*p))) }
+
+# Compute sigma0hat using iterative procedure described in Algorithm 1, p35
+.sigma0hat <- function(Y, X, t = .05, c = 1.1, psi = .01, K = 100, nu = 1e-2){
+  p <- ncol(X) + 1
+  sigma0hat_k0 <- 0
+  sigma0hat_k1 <- psi * sd(Y)
+  sigma0hats <- numeric(K)
+  k <- 1
+  while ( abs(sigma0hat_k1 - sigma0hat_k0) > nu & k < K ) {
+    # lambda <- 2 * c * sigma0hat_k0 * Lambdahat(X, t = t)
+    # lambda <- 2 * c * sigma0hat_k1 * qnorm(1-(t/(2*p)))
+    lambda <- .lambda(sigma0hat_k1, t, p)
+    fit <- glmnet(X, Y)
+    sigma0hat_k0 <- sigma0hat_k1
+    sigma0hat_k1 <- (predict(fit, X, s = lambda) - Y) %>% sd
+    sigma0hats[k] <- sigma0hat_k1
+    k <- k + 1
+  }
+  sigma0hat_k1
+}
 
 .Y <- function(n, X, beta, gs){
   cbind(rep(1, n), X) %*% beta + rnorm(n, 0, gs)
@@ -24,7 +62,7 @@ sim <- function(t){
   beta0 <- c(beta0_S, rep(0, p-s))
   # sigma0s <- c(1, .1)
   sigma0 <- .1
-  n_estimators <- 1
+  n_estimators <- 2
   
   R <- p * n_estimators
   
@@ -38,9 +76,22 @@ sim <- function(t){
   # Generate data
   X <- .X(n, p, Sigma)
   Y <- .Y(n, X, beta0, sigma0)
+  
+  # Lasso
+  r <- 0
+  lasso_fit <- glmnet(X, Y)
+  sigma0hat <- .sigma0hat(Y, X)
+  lambda <- .lambda(sigma0hat, t, p)
+  
+  trial[r+1:(r+p)] <- t
+  sigma0_[r+1:(r+p)] <- sigma0
+  estimator[r+1:(r+p)] <- "Lasso"
+  j[r+1:(r+p)] <- 1:p
+  betahat_j[r+1:(r+p)] <- predict(lasso_fit, type = "coefficients", s = lambda) %>% as.numeric
+  beta0_j[r+1:(r+p)] <- beta0
     
   # CV Lasso
-  r <- 0
+  r <- r + p
   cv_lasso_fit <- cv.glmnet(X, Y, alpha=1, nfolds=5)
   
   trial[r+1:(r+p)] <- t
