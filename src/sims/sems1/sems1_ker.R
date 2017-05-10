@@ -24,7 +24,7 @@ Lambdahat <- function(X, t = .05, m = 100){
 .lambda <- function(sigma0hat, t = .05, p, c = 1.1) { 2 * c * sigma0hat * qnorm(1-(t/(2*p))) }
 
 # Compute sigma0hat using iterative procedure described in Algorithm 1, p35
-.sigma0hat <- function(Y, X, t = .05, c = 1.1, psi = .01, K = 100, nu = 1e-2){
+.sigma0hat <- function(Y, X, t = .05, c = 1.1, psi = .005, K = 100, nu = 1e-2){
   p <- ncol(X) + 1
   sigma0hat_k0 <- 0
   sigma0hat_k1 <- psi * sd(Y)
@@ -61,10 +61,11 @@ sim <- function(t){
   s <- length(beta0_S)
   beta0 <- c(beta0_S, rep(0, p-s))
   # sigma0s <- c(1, .1)
-  sigma0 <- .1
+  sigma0s <- c(1, .1)
+  n_sigmas <- length(sigma0s)
   n_estimators <- 3
   
-  R <- p * n_estimators
+  R <- p * n_estimators * n_sigmas
   
   trial <- numeric(R)
   sigma0_ <- numeric(R)
@@ -73,59 +74,61 @@ sim <- function(t){
   betahat_j <- numeric(R)
   beta0_j <- numeric(R)
   
-  # Generate data
-  X <- .X(n, p, Sigma)
-  Y <- .Y(n, X, beta0, sigma0)
-  
-  # Lasso
-  r <- 0
-  lasso_fit <- glmnet(X, Y)
-  sigma0hat <- .sigma0hat(Y, X)
-  lambda <- .lambda(sigma0hat, t, p)
-  L_betahat <- predict(lasso_fit, type = "coefficients", 
-                       s = lambda, exact = TRUE, x = X, y = Y) %>% as.numeric
-  
-  trial[r+1:(r+p)] <- t
-  sigma0_[r+1:(r+p)] <- sigma0
-  estimator[r+1:(r+p)] <- "Lasso"
-  j[r+1:(r+p)] <- 1:p
-  betahat_j[r+1:(r+p)] <- L_betahat
-  beta0_j[r+1:(r+p)] <- beta0
-  
-  # Post-Lasso
-  r <- r + p
-  Shat <- which(L_betahat != 0)
-  shat <- length(Shat)
-  if ( 1 %in% Shat ) {
-    if ( shat > 1 ) {
-      PL_fit <- lm(Y ~ 1 + X[, Shat[2:shat]-1])
-    } else {
-      PL_fit <- lm(Y ~ 1)
-    }
-  } else {
-    PL_fit <- lm(Y ~ -1 + X[, Shat-1])
-  }
-  PL_betahat <- numeric(p)
-  PL_betahat[Shat] <- coefficients(PL_fit)
-  
-  trial[r+1:(r+p)] <- t
-  sigma0_[r+1:(r+p)] <- sigma0
-  estimator[r+1:(r+p)] <- "Post-Lasso"
-  j[r+1:(r+p)] <- 1:p
-  betahat_j[r+1:(r+p)] <- PL_betahat
-  beta0_j[r+1:(r+p)] <- beta0
+  for ( sigma0 in sigma0s ) {
+    # Generate data
+    X <- .X(n, p, Sigma)
+    Y <- .Y(n, X, beta0, sigma0)
     
-  # CV Lasso
-  r <- r + p
-  cv_lasso_fit <- cv.glmnet(X, Y, alpha=1, nfolds=5)
-  
-  trial[r+1:(r+p)] <- t
-  sigma0_[r+1:(r+p)] <- sigma0
-  estimator[r+1:(r+p)] <- "CV_Lasso"
-  j[r+1:(r+p)] <- 1:p
-  betahat_j[r+1:(r+p)] <- as.numeric(coef(cv_lasso_fit, s = "lambda.min"))
-  beta0_j[r+1:(r+p)] <- beta0
-  
+    # Lasso
+    r <- 0
+    lasso_fit <- glmnet(X, Y)
+    sigma0hat <- .sigma0hat(Y, X)
+    lambda <- .lambda(sigma0hat, t, p)
+    L_betahat <- predict(lasso_fit, type = "coefficients", 
+                         s = lambda, exact = TRUE, x = X, y = Y) %>% as.numeric
+    
+    trial[r+1:(r+p)] <- t
+    sigma0_[r+1:(r+p)] <- sigma0
+    estimator[r+1:(r+p)] <- "Lasso"
+    j[r+1:(r+p)] <- 1:p
+    betahat_j[r+1:(r+p)] <- L_betahat
+    beta0_j[r+1:(r+p)] <- beta0
+    
+    # Post-Lasso
+    r <- r + p
+    Shat <- which(L_betahat != 0)
+    shat <- length(Shat)
+    if ( 1 %in% Shat ) {
+      if ( shat > 1 ) {
+        PL_fit <- lm(Y ~ 1 + X[, Shat[2:shat]-1])
+      } else {
+        PL_fit <- lm(Y ~ 1)
+      }
+    } else {
+      PL_fit <- lm(Y ~ -1 + X[, Shat-1])
+    }
+    PL_betahat <- numeric(p)
+    PL_betahat[Shat] <- coefficients(PL_fit)
+    
+    trial[r+1:(r+p)] <- t
+    sigma0_[r+1:(r+p)] <- sigma0
+    estimator[r+1:(r+p)] <- "Post-Lasso"
+    j[r+1:(r+p)] <- 1:p
+    betahat_j[r+1:(r+p)] <- PL_betahat
+    beta0_j[r+1:(r+p)] <- beta0
+    
+    # CV Lasso
+    r <- r + p
+    cv_lasso_fit <- cv.glmnet(X, Y, alpha=1, nfolds=5)
+    
+    trial[r+1:(r+p)] <- t
+    sigma0_[r+1:(r+p)] <- sigma0
+    estimator[r+1:(r+p)] <- "CV_Lasso"
+    j[r+1:(r+p)] <- 1:p
+    betahat_j[r+1:(r+p)] <- as.numeric(coef(cv_lasso_fit, s = "lambda.min"))
+    beta0_j[r+1:(r+p)] <- beta0
+  }
+
   data.frame(
     trial = trial,
     sigma0 = sigma0_,
