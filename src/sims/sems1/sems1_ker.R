@@ -9,7 +9,7 @@ library(glmnet)
 library(flare)
 
 # Approximation of Lambda defined in eq (3.10), p8
-Lambdahat <- function(X, t = .05, m = 100){
+Lambdahat <- function(X, t = .05, m = 1000){
   n <- nrow(X)
   g <- rnorm(n * m, 0, 1)
   map(1:m, ~ (X * rnorm(m, 0, 1)) %>% 
@@ -121,17 +121,6 @@ sim <- function(t){
     j[(r+1):(r+p)] <- 1:p
     betahat_j[(r+1):(r+p)] <- PL_betahat
     beta0_j[(r+1):(r+p)] <- beta0
-
-    # CV Lasso
-    r <- r + p
-    cv_lasso_fit <- cv.glmnet(X, Y, alpha=1, nfolds=5)
-
-    trial[(r+1):(r+p)] <- t
-    sigma0_[(r+1):(r+p)] <- sigma0
-    estimator[(r+1):(r+p)] <- "CV_Lasso"
-    j[(r+1):(r+p)] <- 1:p
-    betahat_j[(r+1):(r+p)] <- as.numeric(coef(cv_lasso_fit, s = "lambda.min"))
-    beta0_j[(r+1):(r+p)] <- beta0
    
     # Iterated Lasso
     r <- r + p
@@ -174,6 +163,20 @@ sim <- function(t){
     j[(r+1):(r+p)] <- 1:p
     betahat_j[(r+1):(r+p)] <- PIL_betahat
     beta0_j[(r+1):(r+p)] <- beta0
+    
+    
+    # CV Lasso
+    r <- r + p
+    cv_lasso_fit <- cv.glmnet(X, Y, alpha=1, nfolds=5)
+    
+    trial[(r+1):(r+p)] <- t
+    sigma0_[(r+1):(r+p)] <- sigma0
+    estimator[(r+1):(r+p)] <- "CV_Lasso"
+    j[(r+1):(r+p)] <- 1:p
+    betahat_j[(r+1):(r+p)] <- as.numeric(coef(cv_lasso_fit, s = "lambda.min"))
+    beta0_j[(r+1):(r+p)] <- beta0
+    
+    
   }
 
   data.frame(
