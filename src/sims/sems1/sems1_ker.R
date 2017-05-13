@@ -21,7 +21,7 @@ Lambdahat <- function(X, t = .05, m = 100){
     as.numeric
 }
 
-.lambda <- function(sigma0hat, t = .05, p, c = 1.1) { 2 * c * sigma0hat * qnorm(1-(t/(2*p))) }
+.lambda <- function(sigma0hat, n, p, t = .05, c = 1.1) { 2 * sqrt(n) * c * sigma0hat * qnorm(1-(t/(2*p))) }
 
 # Compute sigma0hat using iterative procedure described in Algorithm 1, p35
 .sigma0hat <- function(Y, X, t = .05, c = 1.1, psi = .005, K = 100, nu = 1e-2){
@@ -33,10 +33,10 @@ Lambdahat <- function(X, t = .05, m = 100){
   while ( abs(sigma0hat_k1 - sigma0hat_k0) > nu & k < K ) {
     # lambda <- 2 * c * sigma0hat_k0 * Lambdahat(X, t = t)
     # lambda <- 2 * c * sigma0hat_k1 * qnorm(1-(t/(2*p)))
-    lambda <- .lambda(sigma0hat_k1, t, p)
+    lambda <- .lambda(sigma0hat_k1, n, p, t = t)
     fit <- glmnet(X, Y)
     sigma0hat_k0 <- sigma0hat_k1
-    sigma0hat_k1 <- (predict(fit, X, s = lambda) - Y) %>% sd
+    sigma0hat_k1 <- (predict(fit, X, s = lambda/n) - Y) %>% sd
     sigma0hats[k] <- sigma0hat_k1
     k <- k + 1
   }
@@ -85,9 +85,10 @@ sim <- function(t){
     
     lasso_fit <- glmnet(X, Y)
     sigma0hat <- .sigma0hat(Y, X)
-    lambda <- .lambda(sigma0hat, t, p)
+    lambda <- .lambda(sigma0hat, n, p, t = t)
     L_betahat <- predict(lasso_fit, type = "coefficients", 
-                         s = lambda, exact = TRUE, x = X, y = Y) %>% as.numeric
+                         s = lambda/n, exact = TRUE, x = X, y = Y) %>% 
+      as.numeric
     
     trial[(r+1):(r+p)] <- t
     sigma0_[(r+1):(r+p)] <- sigma0
@@ -111,6 +112,8 @@ sim <- function(t){
     }
     PL_betahat <- numeric(p)
     PL_betahat[Shat] <- coefficients(PL_fit)
+    print(Shat)
+    print(PL_betahat)
 
     trial[(r+1):(r+p)] <- t
     sigma0_[(r+1):(r+p)] <- sigma0
