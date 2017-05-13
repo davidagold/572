@@ -2,6 +2,7 @@
 
 library(dplyr)
 library(tidyr)
+library(purrr)
 library(MASS)
 library(mvtnorm)
 library(glmnet)
@@ -11,34 +12,41 @@ library(flare)
 Lambdahat <- function(X, t = .05, m = 100){
   n <- nrow(X)
   g <- rnorm(n * m, 0, 1)
-  (do.call(rbind, replicate(100, X, simplify = FALSE)) * g) %>% 
-    { data.frame(i = rep(1:n, times=m), r = rep(1:m, each = n), .)} %>%
-    gather(X_j, X_ij, contains("X")) %>%
-    group_by(r, X_j) %>% 
-    summarize(sum_X_ij = sum(X_ij)) %>%
-    summarize(maxsum_X_ij = max(sum_X_ij)) %>%
-    summarize(q = quantile(maxsum_X_ij, 1-t)) %>% 
-    as.numeric
+  map(1:m, ~ (X * rnorm(m, 0, 1)) %>% 
+        apply(2, sum) %>% 
+        max) %>%
+    as.numeric %>%
+    quantile(1 - t)
+  
+  # (do.call(rbind, replicate(100, X, simplify = FALSE)) * g) %>% 
+  #   { data.frame(i = rep(1:n, times=m), r = rep(1:m, each = n), .)} %>%
+  #   gather(X_j, X_ij, contains("X")) %>%
+  #   group_by(r, X_j) %>% 
+  #   summarize(sum_X_ij = sum(X_ij)) %>%
+  #   summarize(maxsum_X_ij = max(sum_X_ij)) %>%
+  #   summarize(q = quantile(maxsum_X_ij, 1-t)) %>% 
+  #   as.numeric
 }
 
 .lambda <- function(sigma0hat, n, p, t = .05, c = 1.1) { 2 * sqrt(n) * c * sigma0hat * qnorm(1-(t/(2*p))) }
 
 # Compute sigma0hat using iterative procedure described in Algorithm 1, p35
-.sigma0hat <- function(Y, X, t = .05, c = 1.1, psi = .005, K = 100, nu = 1e-2){
+.sigma0hat <- function(Y, X, t = .05, c = 1.1, psi = .02, K = 100, nu = 1e-2){
+  n <- nrow(X)
   p <- ncol(X) + 1
   sigma0hat_k0 <- 0
   sigma0hat_k1 <- psi * sd(Y)
   sigma0hats <- numeric(K)
   k <- 1
   while ( abs(sigma0hat_k1 - sigma0hat_k0) > nu & k < K ) {
-    # lambda <- 2 * c * sigma0hat_k0 * Lambdahat(X, t = t)
-    # lambda <- 2 * c * sigma0hat_k1 * qnorm(1-(t/(2*p)))
-    lambda <- .lambda(sigma0hat_k1, n, p, t = t)
+    lambda <- 2 * c * sigma0hat_k0 * Lambdahat(X, t = t)
+    # lambda <- .lambda(sigma0hat_k1, n, p, t = t)
     fit <- glmnet(X, Y)
     sigma0hat_k0 <- sigma0hat_k1
-    sigma0hat_k1 <- (predict(fit, X, s = lambda/n) - Y) %>% sd
+    sigma0hat_k1 <- (predict(fit, X, s = lambda/n, exact = TRUE, x = X, y = Y) - Y) %>% sd
     sigma0hats[k] <- sigma0hat_k1
     k <- k + 1
+    print(sigma0hat_k1)
   }
   sigma0hat_k1
 }
@@ -60,7 +68,6 @@ sim <- function(t){
   beta0_S <- c(1, 1, 1/2, 1/3, 1/4, 1/5)
   s <- length(beta0_S)
   beta0 <- c(beta0_S, rep(0, p-s))
-  # sigma0s <- c(1, .1)
   sigma0s <- c(1, .1)
   n_sigmas <- length(sigma0s)
   n_estimators <- 3
@@ -84,7 +91,9 @@ sim <- function(t){
     r <- p * n_estimators * (i - 1)
     
     lasso_fit <- glmnet(X, Y)
-    sigma0hat <- .sigma0hat(Y, X)
+    # sigma0hat <- .sigma0hat(Y, X)
+    # print(sigma0hat)
+    sigma0hat <- sigma0
     lambda <- .lambda(sigma0hat, n, p, t = t)
     L_betahat <- predict(lasso_fit, type = "coefficients", 
                          s = lambda/n, exact = TRUE, x = X, y = Y) %>% 
@@ -112,8 +121,8 @@ sim <- function(t){
     }
     PL_betahat <- numeric(p)
     PL_betahat[Shat] <- coefficients(PL_fit)
-    print(Shat)
-    print(PL_betahat)
+    # print(Shat)
+    # print(PL_betahat)
 
     trial[(r+1):(r+p)] <- t
     sigma0_[(r+1):(r+p)] <- sigma0
@@ -145,4 +154,6 @@ sim <- function(t){
   )
 }
 
-d <- sim(1)
+# d <- sim(1)
+# d %>%
+#   filter(is.na(betahat_j))
