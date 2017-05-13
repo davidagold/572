@@ -17,36 +17,29 @@ Lambdahat <- function(X, t = .05, m = 100){
         max) %>%
     as.numeric %>%
     quantile(1 - t)
-  
-  # (do.call(rbind, replicate(100, X, simplify = FALSE)) * g) %>% 
-  #   { data.frame(i = rep(1:n, times=m), r = rep(1:m, each = n), .)} %>%
-  #   gather(X_j, X_ij, contains("X")) %>%
-  #   group_by(r, X_j) %>% 
-  #   summarize(sum_X_ij = sum(X_ij)) %>%
-  #   summarize(maxsum_X_ij = max(sum_X_ij)) %>%
-  #   summarize(q = quantile(maxsum_X_ij, 1-t)) %>% 
-  #   as.numeric
 }
 
-.lambda <- function(sigma0hat, n, p, t = .05, c = 1.1) { 2 * sqrt(n) * c * sigma0hat * qnorm(1-(t/(2*p))) }
+# .lambda <- function(sigma0hat, n, p, t = .05, c = 1.1) { 2 * sqrt(n) * c * sigma0hat * qnorm(1-(t/(2*p))) }
+.lambda <- function(sigma0hat, X, t = 0.05, c = 1.1) {  2 * c * sigma0hat * Lambdahat(X, t = t) }
 
 # Compute sigma0hat using iterative procedure described in Algorithm 1, p35
-.sigma0hat <- function(Y, X, t = .05, c = 1.1, psi = .02, K = 100, nu = 1e-2){
+.sigma0hat <- function(Y, X, t = .05, c = 1.1, psi = .1, K = 100){
   n <- nrow(X)
   p <- ncol(X) + 1
-  sigma0hat_k0 <- 0
+  sigma0hat_k0 <- -Inf
   sigma0hat_k1 <- psi * sd(Y)
-  sigma0hats <- numeric(K)
+  nu <- sigma0hat_k1
+  # sigma0hats <- numeric(K)
   k <- 1
   while ( abs(sigma0hat_k1 - sigma0hat_k0) > nu & k < K ) {
-    lambda <- 2 * c * sigma0hat_k0 * Lambdahat(X, t = t)
+    lambda <- .lambda(sigma0hat_k1, X)
     # lambda <- .lambda(sigma0hat_k1, n, p, t = t)
     fit <- glmnet(X, Y)
     sigma0hat_k0 <- sigma0hat_k1
     sigma0hat_k1 <- (predict(fit, X, s = lambda/n, exact = TRUE, x = X, y = Y) - Y) %>% sd
-    sigma0hats[k] <- sigma0hat_k1
+    # sigma0hats[k] <- sigma0hat_k1
     k <- k + 1
-    print(sigma0hat_k1)
+    # print(sigma0hat_k1)
   }
   sigma0hat_k1
 }
@@ -70,7 +63,7 @@ sim <- function(t){
   beta0 <- c(beta0_S, rep(0, p-s))
   sigma0s <- c(1, .1)
   n_sigmas <- length(sigma0s)
-  n_estimators <- 3
+  n_estimators <- 5
   
   R <- p * n_estimators * n_sigmas
   
@@ -92,9 +85,9 @@ sim <- function(t){
     
     lasso_fit <- glmnet(X, Y)
     # sigma0hat <- .sigma0hat(Y, X)
-    # print(sigma0hat)
     sigma0hat <- sigma0
-    lambda <- .lambda(sigma0hat, n, p, t = t)
+    # lambda <- .lambda(sigma0hat, n, p, t = t)
+    lambda <- .lambda(sigma0hat, X)
     L_betahat <- predict(lasso_fit, type = "coefficients", 
                          s = lambda/n, exact = TRUE, x = X, y = Y) %>% 
       as.numeric
@@ -106,7 +99,7 @@ sim <- function(t){
     betahat_j[(r+1):(r+p)] <- L_betahat
     beta0_j[(r+1):(r+p)] <- beta0
 
-    #Post-Lasso
+    # Post-Lasso
     r <- r + p
     Shat <- which(L_betahat != 0)
     shat <- length(Shat)
@@ -121,8 +114,6 @@ sim <- function(t){
     }
     PL_betahat <- numeric(p)
     PL_betahat[Shat] <- coefficients(PL_fit)
-    # print(Shat)
-    # print(PL_betahat)
 
     trial[(r+1):(r+p)] <- t
     sigma0_[(r+1):(r+p)] <- sigma0
@@ -141,7 +132,48 @@ sim <- function(t){
     j[(r+1):(r+p)] <- 1:p
     betahat_j[(r+1):(r+p)] <- as.numeric(coef(cv_lasso_fit, s = "lambda.min"))
     beta0_j[(r+1):(r+p)] <- beta0
+   
+    # Iterated Lasso
+    r <- r + p
     
+    sigma0hat <- .sigma0hat(Y, X)
+    lambda <- .lambda(sigma0hat, X)
+    IL_betahat <- predict(lasso_fit, type = "coefficients", 
+                         s = lambda/n, exact = TRUE, x = X, y = Y) %>% 
+      as.numeric
+    
+    trial[(r+1):(r+p)] <- t
+    sigma0_[(r+1):(r+p)] <- sigma0
+    estimator[(r+1):(r+p)] <- "Iter-Lasso"
+    j[(r+1):(r+p)] <- 1:p
+    betahat_j[(r+1):(r+p)] <- IL_betahat
+    beta0_j[(r+1):(r+p)] <- beta0
+    
+    # Post-Iterated-Lasso
+    r <- r + p
+    
+    IL_Shat <- which(IL_betahat != 0)
+    IL_shat <- length(IL_Shat)
+    if ( 1 %in% IL_Shat ) {
+      if ( IL_shat > 1 ) {
+        PIL_fit <- lm(Y ~ 1 + X[, IL_Shat[2:IL_shat]-1])
+      } else {
+        PIL_fit <- lm(Y ~ 1)
+      }
+    } else {
+      PIL_fit <- lm(Y ~ -1 + X[, IL_Shat-1])
+    }
+    PIL_betahat <- numeric(p)
+    PIL_betahat[IL_Shat] <- coefficients(PIL_fit)
+    # print(Shat)
+    # print(PL_betahat)
+    
+    trial[(r+1):(r+p)] <- t
+    sigma0_[(r+1):(r+p)] <- sigma0
+    estimator[(r+1):(r+p)] <- "Post-Iter-Lasso"
+    j[(r+1):(r+p)] <- 1:p
+    betahat_j[(r+1):(r+p)] <- PIL_betahat
+    beta0_j[(r+1):(r+p)] <- beta0
   }
 
   data.frame(
