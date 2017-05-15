@@ -294,8 +294,10 @@ Inference for the treatment effect in an IV model proceeds by fitting the observ
 \newcommand{\event}{\mathcal{E}}
 \newcommand{\kp}{\otimes}
 \newcommand{\kpt}{\kp2}
+\newcommand{\B}{\bs{B}}
+\newcommand{\ip}[3]{#3\langle#1,#2 #3\rangle}
 
-For $p\in\N$, we let $[p] := \{1,\ldots,p\}$. We let bold and non-bold lowercase letters denote vectors and scalars, respectively; we use bold uppercase letters to denote matrices. We typically denote the components of a vector (matrix) by the non-bold (lowercase) counterpart of the letter that denotes the vector (matrix). If $\Z = (z_{ij})_{i,j\in[n]\times[p]}$, we use a superscript to refer to columns $\z^j = (z_{ij})_{i\inn}$ and a subscript to refer to rows $\z_i = (z_{ij})_{j\in[p]}$. We let $\|\cdot\|_p$ denote the usual $\ell_p$ norm over Euclidean spaces.  For $\u \in \R^p$, we let $\supp(\u) := \{j\in[p]: u_j \neq 0\}$ and $\|\u\|_0 = |\supp(\u)|$; we let $\|\u\|_\infty = \max_{j\in[p]} \{u_j\}$. We let $\otimes$ denote the Kronecker product and write $\u^{\kpt} = \u \kp \u$ for $\u\in\R^p$. If $x$ is a (random or deterministic) quantity indexed by $i\inn$, we let $\Exn[x_i] = n^{-1}\sum_{i=1}^n x_i$; we let $\En = \E\circ\Exn$ denote the ``average expectation'' operator. For $a,b\in\R$, we let $a\vee b = \max\{a,b\}$ and $a\wedge b = \min\{a,b\}$. We write $a_n \lesssim b_n$ if $a_n \leq Cb_n$ for a universal constant $C$; we write $a_n \lesssim_\Prb b_n$ if $a_n = O_\Prb(b_n)$. We say that an event $\event \equiv \event_n$ occurs with high probability if $\lim_{n\to\infty} \Prb \, \event = 1$. 
+For $p\in\N$, we let $[p] := \{1,\ldots,p\}$. We let bold and non-bold lowercase letters denote vectors and scalars, respectively; we use bold uppercase letters to denote matrices. We typically denote the components of a vector (matrix) by the non-bold (lowercase) counterpart of the letter that denotes the vector (matrix). If $\Z = (z_{ij})_{i,j\in[n]\times[p]}$, we use a superscript to refer to columns $\z^j = (z_{ij})_{i\inn}$ and a subscript to refer to rows $\z_i = (z_{ij})_{j\in[p]}$. We let $\|\cdot\|_p$ denote the usual $\ell_p$ norm over Euclidean spaces.  For $\u \in \R^p$, we let $\supp(\u) := \{j\in[p]: u_j \neq 0\}$ and $\|\u\|_0 = |\supp(\u)|$; we let $\|\u\|_\infty = \max_{j\in[p]} \{u_j\}$. We let $\otimes$ denote the Kronecker product and write $\u^{\kpt} = \u \kp \u$ for $\u\in\R^p$; for conformal matrices $\B$ we write $\|\u\|_{\B} = \ip{\u}{\B\u}{}$. If $x$ is a (random or deterministic) quantity indexed by $i\inn$, we let $\Exn[x_i] = n^{-1}\sum_{i=1}^n x_i$; we let $\En = \E\circ\Exn$ denote the ``average expectation'' operator. For $a,b\in\R$, we let $a\vee b = \max\{a,b\}$ and $a\wedge b = \min\{a,b\}$. We write $a_n \lesssim b_n$ if $a_n \leq Cb_n$ for a universal constant $C$; we write $a_n \lesssim_\Prb b_n$ if $a_n = O_\Prb(b_n)$. We say that an event $\event \equiv \event_n$ occurs with high probability if $\lim_{n\to\infty} \Prb \, \event = 1$. 
 
 
 
@@ -308,7 +310,6 @@ For $p\in\N$, we let $[p] := \{1,\ldots,p\}$. We let bold and non-bold lowercase
 \newcommand{\px}{p_{\x}}
 \newcommand{\pu}{p_{\u}}
 \newcommand{\pun}{p_{\u,n}}
-\newcommand{\fhat}{\hat{f}}
 \newcommand{\regb}{\bs{\gb}}
 \newcommand{\regbh}{\hat{\regb}}
 \newcommand{\fb}{f_{\regb}}
@@ -335,6 +336,10 @@ For $p\in\N$, we let $[p] := \{1,\ldots,p\}$. We let bold and non-bold lowercase
 \newcommand{\tune}{\lambda}
 \newcommand{\ersi}{\gep_i}
 \newcommand{\sd}{\gs}
+\newcommand{\f}{\bs{f}}
+\newcommand{\fhat}{\hat{\f}}
+\newcommand{\fhc}{\hat{f}}
+\newcommand{\ffb}{\bs{f}_{\regb}}
 
 \section{Methods}
 
@@ -342,7 +347,9 @@ In Section \ref{ss:inf}, we discussed how IV and PL models come to bear on econo
 \be\label{eq:mod1}
 	y_i \ = \ f(\u_i) + \ersi\,,
 \ee
-where for each $i\in[n]$, $y_i \in \R$ is a response, $\u_i = (u_1,\ldots,u_{\pu}) \in \Us \subseteq \R^{\pu}$ for $\pu \equiv \pun$ are exposures, $\ersi \sim \Normal(0,\sd^2)$ with $\sd \equiv \sd_n$, and $f \equiv f_n : \Us \to \R$ is the target regression function. For brevity, we write $f_i := f(\u_i)$. In turn, it is important to identify conditions under which such estimation is possible. 
+where for each $i\in[n]$, $y_i \in \R$ is a response, $\u_i = (u_1,\ldots,u_{\pu}) \in \Us \subseteq \R^{\pu}$ for $\pu \equiv \pun$ are exposures, $\ersi \sim \Normal(0,\sd^2)$ with $\sd \equiv \sd_n$, and $f \equiv f_n : \Us \to \R$ is the target regression function. For brevity, we write $f_i := f(\u_i)$. 
+
+In particular, efficient estimation of the treatment effect in the IV model depends crucially on consistently estimating the conditional means of the endogenous variables given the instrumental variables; see \cite{A74}, \cite{N90}. In turn, it is important to identify conditions under which such estimation is possible. 
 
 
 
@@ -352,7 +359,28 @@ where for each $i\in[n]$, $y_i \in \R$ is a response, $\u_i = (u_1,\ldots,u_{\pu
 % 
 \subsection{Series estimation}\label{ss:se}
 
-One strategy is to suppose that there exist transformations $\z_i \equiv \z_i(\u_i) := (z^j(\u_i))_{j\in[\pz]} \in \Zs \subseteq \R^{\pz}$ of $\u_i$ such that the regression function $f$ of model \eqref{eq:mod1} may be well approximated by some $\fb \equiv \fbn : \Zs \to \R$ belonging to a family $\famb := \{ f_b:b\in\Bs\}$ indexed by $\Bs \equiv \Bs_n \subseteq \R^{p_\Bs}$. If $\famb$ is suitably restricted, then a natural estimator of $\fb$ is $\fbhat := f_{\regbh}$, where $\regbh \equiv \regbh_n(\y, \Z)$ is an estimator of $\regb$ fit to the model $\E[y_i\,|\,\z_i] = \fb(\z_i)$ given the data $\y = (y_i)_{i\inn}, \Z = (\z^j)_{j\in[\pz]}$. However, the aforementioned model is correct only up to the approximation errors $\remi \equiv \remi(\regb) := f(\u_i) - \fb(\z_i)$ for $i\inn$. Let $\rb$ denote the rate (up to order) of the scaled $\ell_2$ approximation error of $\fb$, so that the $\remi$ satisfy $\En^{1/2}[r_i] \lesssim \rb$. Given an approximation rate $\rb$ and a sequence of such estimators $\regbh$, it is natural to ask: (i) how well do the $\regbh$ estimate $\regb$ despite such approximation error, and (ii) how well do the resultant $\fbhat$ estimate $f$? 
+One strategy is to suppose that there exist transformations $\z_i \equiv \z_i(\u_i) := (z^j(\u_i))_{j\in[\pz]} \in \Zs \subseteq \R^{\pz}$ of $\u_i$ such that the regression function $f$ of model \eqref{eq:mod1} may be well approximated by some $\fb \equiv \fbn : \Zs \to \R$ belonging to a family $\famb := \{ f_b:b\in\Bs\}$ indexed by $\Bs \equiv \Bs_n \subseteq \R^{p_\Bs}$. If $\famb$ is suitably restricted, then a natural estimator of $\fb$ is $\fbhat := f_{\regbh}$, where $\regbh \equiv \regbh_n(\y, \Z)$ is an estimator of $\regb$ fit to the model $\E[y_i\,|\,\z_i] = \fb(\z_i)$ given the data $\y = (y_i)_{i\inn}, \Z = (\z^j)_{j\in[\pz]}$. For linear $\fb$, as we consider in the sequel, the respective $\fbhat$ are known as \emph{series estimators}. The nomenclature is due to the typical expansion of $\u$ into a series of basis functions $\z^j$, $j\in[\pz]$. 
+
+Note that the aforementioned model is correct only up to the approximation errors $\remi \equiv \remi(\regb) := f(\u_i) - \fb(\z_i)$ for $i\inn$. Let $\rb$ denote the rate (up to order) of the scaled $\ell_2$ approximation error of $\fb$, so that the $\remi$ satisfy $\Exn^{1/2}[r_i] \lesssim_\Prb \rb$. Given an approximation rate $\rb$ and a sequence of such estimators $\regbh$, it is natural to ask: (i) how well do the $\regbh$ estimate $\regb$ despite such approximation error, and (ii) how well do the resultant $\fbhat$ estimate $f$? 
+
+In well-known results, \cite{N97} answers such questions for linear $\fb$ under certain conditions on the smoothness of $f$ and the series terms $\z(\u)$. In particular, \cite{N97} studies $f$ for which there exist sequences of approximating $\regb$ such that the maximum partial derivatives of the approximation errors $\remi$ are of the order $\pz^{-\ga}$ for some $\ga > 0$. For such $f$, and for series terms $\z^j$ with well-behaved covariance matrices and which satisfy $\lim_{n\to\infty} \zeta(\pz)^2\pz/n = 0$, where $\zeta(\pz)$ is a bound on the magnitude of the series terms, \cite{N97} derives the following bound on the mean-squared error of the corresponding series estimator $\fhc$
+\benn
+	\int_{\Us} \{\fhc(\z(\u)) - f(\u)\}^2 dF(\u) \ = \ O_\Prb(\pz/n + \pz^{-2\ga}) \,.
+\eenn
+For $\z$ consisting of power series and splines, the above estimate leads to optimal convergence rates for the usual $\ell_p$ norm of the error $\fhc(\z(\u)) - f(\u)$, in the sense of \cite{S82}'s bounds on global rates for nonparametric regression. \cite{N97} also derives uniform convergence rates, which are not optimal for such $\z$. In turn, such rates establish $\sqrt{n}$-consistency for parameters given by pathwise-differentiable functionals of the conditional mean $f$, under further conditions suitable to the context.  
+
+For our purposes, it is relevant to note that the requirement that $\lim_{n\to\infty} \zeta(\pz)^2\pz/n = 0$ necessitates that $\pz^2/n \to 0$ for in the case of $\z$ given by regression splines and $\pz^3/n \to 0$ for $\z$ given by power series bases. Thus, $f$ must be sufficiently smooth to be well-approximated by a suitably controlled number of series terms $\pz$.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% IV SELECTION
+\subsection{Selection of instrumental variables}
+\renewcommand{\P}{\bs{P}}
+
+The effectiveness of series estimation requires good selection of series terms. Unfortunately, the aforementioned results say nothing about methods for empirical selection of the latter. One reasonable approach, as suggested by \cite{A74} and \cite{K71}, is simply to include ``lower-order'' polynomial transformations of the instrumental variables $\u^j$, $j\in[\pu]$, so that the number of terms increases modestly with $n$. Prima facie, there is ``room'' between the growth rate limits on the number of series terms $\pz$ imposed by, say, \cite{N97}, and the sequences $\pz$ that satisfy $\pz/n \to \ga \in [0, \infty)$ that can be handled by the estimators considered in, say, \cite{B94} and \cite{HHN08}. However, \cite{H02} notes, the limiting distributions of the latter estimators may depend on $\ga$ and thereby may not reach the efficiency bound entailed by the former's convolution theorem. 
+
+It would be unfortunate if, in order accommodate the many instrumental variables required to achieve efficiency, one needed to use estimators for which such efficiency gains are irrelevant. Indeed, \cite{H02} cites \cite{N97} as evidence that a parsimonious set of series terms $\z^j$ is preferable to a set ``many instrumental variables''. The former suggests a high-level condition that requires the existence of a projection matrix $\P$ close to that associated with $\Z$ but which satisfies $\rank \P = o(\sqrt{n})$. If a number of columns $\z^j$ on this desired order ``well-approximated'' (the image of) $\Z$, then one could use the projection associated with the matrix formed by such columns. This observation, though heuristic in nature, further highlights variable selection as a missing ingredient for effient estimation in the context of IV models.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -360,29 +388,34 @@ One strategy is to suppose that there exist transformations $\z_i \equiv \z_i(\u
 % APPROXIMATE SPARSITY
 \subsection{Approximate sparsity}
 
-For linear $\fb$ that depend sparsely on their arguments, answers to the foregoing questions are available. If, for a sequence $\sb \equiv \sb_n$ and the approximation rate $\rb = \sd\sqrt{\sb/n}$, there exists a sequence of $\fb$ each belonging to the respective family
+
+The previous section highlighted a tension between the objectives of, one the one hand, including sufficiently many instrumental variables (or transformations thereof) in one's first-stage regression in order to accurately estimate the conditional means of the endogenous variables and, on the other hand, including sufficiently few instrumental variables so as not to negate any putative efficiency gains. The primary contribution of the presently studied paper is to use $\ell_1$-regularized estimation in the first-stage to reconcile these competing objectives. 
+
+We saw in Section \ref{ss:se} that rates of convergence for series estimators can be derived by imposing differentiability restrictions on the approximation errors $\remi$. \cite{BCH11} give similar results for linear $\fb$ that depend sparsely on their arguments. If, for a sequence $\sb \equiv \sb_n$ and the approximation rate $\rb = \sd\sqrt{\sb/n}$, there exists a sequence of $\fb$ each belonging to the respective family
 \benn%\label{def:fams}
 	\fams \ := \ \{ f_{\bs{b}}: \z \mapsto \langle \z, \bs{b}\rangle \,:\, \bs{b} \in \R^{\pz},\, \|\bs{b}\|_0 \leq \sb \} \,,
 \eenn
 then, under forthcoming conditions and a suitable choice of $\tune$, the Lasso estimator
-\benn
+\be\label{def:lasso}
 	\regbh \ \in \ \argmin_{\bs{b}\,\in\,\R^{\pz}} \big\{ \|\y - \Z\bs{b}\|_2^2/n + \tune\|\bs{b}\|_1 \big\}
-\eenn
-satisfies $\|\regbh - \regb\|_{\gramhat} \lesssim_\Prb \sd\sqrt{s\log(\pz\vee n)/n}$ and hence obtains a prediction rate of order $\rb\sqrt{\log(\pz\vee n)}$. The estimator $\dhat := (\fbhat(\z_i))_{\inn}$ of $\d := (d_i)_{\inn}$ in turn satisfies
+\ee
+satisfies $\|\regbh - \regb\|_{\gramhat} \lesssim_\Prb \sd\sqrt{s\log(\pz\vee n)/n}$, where $\gramhat = \Exn[\z_i^{\kpt}]$ and hence obtains a prediction rate of order $\rb\sqrt{\log(\pz\vee n)}$. The estimator $\fhat := (\fbhat(\z_i))_{\inn}$ of $\f := (f_i)_{\inn}$ in turn satisfies
 \begin{align}
-	\| \dhat -\d \|_2 \ & \leq \  \|\dhat - \db\|_2 + \| \d - \db \|_2 \nonumber\\
+	\| \fhat -\f \|_2 \ & \leq \  \|\fhat - \ffb\|_2 + \| \f - \fb \|_2 \nonumber\\
 	& = \ \sqrt{n}\|\regbh - \regb\|_{\gramhat} + \|\rem\|_2 \ \lesssim_\Prb \ \sd\sqrt{\sb\log(\pz\vee n)} \,,
 \end{align}
-where $\db := (\fb(\z_i))_{i\inn}$. Under the typical assumptions that $\sd = O(1)$ and $\sb = o(n/\log\pz)$, the right-hand side above is~$o(\sqrt{n})$, which entails that $\dhat$ achieves ``consistency'' in (scaled) $\ell_2$-norm. The foregoing considerations suggest the following characterization of such models.
+where $\ffb := (\fb(\z_i))_{i\inn}$. Under the typical assumptions that $\sd = O(1)$ and $\sb = o(n/\log\pz)$, the right-hand side above is~$o(\sqrt{n})$, which entails that $\fhat$ achieves ``consistency'' in (scaled) $\ell_2$-norm. The foregoing considerations suggest the following characterization of such models.
 
-\begin{defi}[Approximate sparsity] Given a sequence of models of the form \eqref{eq:mod1} and respective observations $(y_i, \u_i)_{i\inn} \in \R^{1\times\pu}$, we say that the regression functions $f$ are \emph{approximately sparse} relative to a sequence of transformations $\z \equiv \z_n(\u)$, where the $\z^j$ are considered fixed and scaled so that $\|\z^j\|_2 = \sqrt{n}$, and a sequence of approximating functions $\fb \equiv \fbn \in \fams$ for $\sb \equiv \sb_n$ if (i) $\sb = o(n/\log\pz)$ and (ii) the approximation errors $\remi(\regb)$ for $i\inn$ satisfy $\Exn^{1/2}[\remi^2] \lesssim \sd\sqrt{\sb/n}$.
+\begin{defi}[Approximate sparsity]\label{def:as} Given a sequence of models of the form \eqref{eq:mod1} and respective observations $(y_i, \u_i)_{i\inn} \in \R^{1\times\pu}$, we say that the regression functions $f$ are \emph{approximately sparse} relative to a sequence of transformations $\z \equiv \z_n(\u)$, where the $\z^j$ are considered fixed and scaled so that $\|\z^j\|_2 = \sqrt{n}$, and a sequence of approximating functions $\fb \equiv \fbn \in \fams$ for $\sb \equiv \sb_n$ if (i) $\sb = o(n/\log\pz)$ and (ii) the approximation errors $\remi(\regb)$ for $i\inn$ satisfy $\Exn^{1/2}[\remi^2] \lesssim \sd\sqrt{\sb/n}$.
 \end{defi}
 
 \begin{rek} That a sequence of regression functions is approximately sparse is equivalent to that Condition ASM of \cite{BCH11} holds. Our choice of presentation is motivated by concerns for clarity of the order of logical quantification over the different model parts. 
 \end{rek}
 
+\begin{rek} As \cite{BCH11} consider fixed instrumental variables $\z^j$, they present their approximation error rate as a deterministic bound, in contrast to the MSE rate produced by \cite{N97}. \cite{BCCH12} consider the case of random $\z^j$ and hence present approximate sparsity in terms of a probabilistic bound on the empirical approximation error. 
+\end{rek}
 
-The approximation scheme devised above is ... The analyst may wish to expand to an arbitrary number of approximation functions $z_j$ under the assumption that few such $z_j$ will contribute non-trivially to $\fbhat$. That is, the analyst may suppose that $\regb$ is $\sb$-\emph{sparse} --- that is, $\Sb := \supp \regb$ satisfies $|\Sb| \leq \sb$ for some $\sb \ll \dim(\regb)$. If $S$ were known, the analyst could ...   
+The upshot of Definition \label{def:as} is that one may apply modern statistical learning techniques to estimate an approximately sparse regression function at a near-oracle rate without any prior knowledge of which series terms ought to be included in the model. In the IV context, this benefit generalizes to the situation in which many instrumental variables are immediately available, say as levels of a large factor. By using $\ell_1$-regularized estimation methods, we needn't necessarily be caught between large finite-sample bias due to the use of many instrumental variables and asymptotic inefficiency due to corrections for the former.  
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -390,7 +423,19 @@ The approximation scheme devised above is ... The analyst may wish to expand to 
 % 
 \subsection{Lasso estimation}
 
-In this section we briefly review the conditions that lead to good performance for Lasso estimators. 
+In this section we briefly review the conditions that lead to good performance for Lasso estimators. There two primary ingredients: (i) suitable choice of the tuning parameter $\tune$, and (ii) conditions on the empirical gram matrix $\gramhat = \Exn[\z_i^{\kpt}]$. The most widely cited oracle rates for the Lasso estimator fit to a model such as that of \eqref{eq:mod1} require that the tuning parameter dominate the ``noise'' term $\|\Exn[\z_i\ersi]\|_\infty$. For Gaussian $\ersi$, \cite{BC13} one may achieve as much with high probability by setting
+\be\label{tune1}
+%	\tune \ \geq \ 2 c \sd \Phi^{-1}(1-\gamma/2\pz)\,,
+	\tune \ = \ 2 c \sd \Lambda(1-\gamma\,|\,\Z)\,,
+\ee
+where $c, \gamma$ are controlled tolerances and 
+\begin{align*}
+	\Lambda(1 - \gamma\,|\,\Z) \ & := \ (1-\gamma)\text{-quantile of } n\|\Exn[\z_ig_i]\|_\infty\\
+	& \leq \ \sqrt{n}\Phi^{-1}(1-\gamma/2\pz) \ \leq \ \sqrt{2n\log(2\pz/\gamma)} \,,
+\end{align*}
+where $g_i \sim_{iid} \Normal(0,1), i\in[n]$ and the estimate of the right-hand side above figures into the tuning parameter suggestion by \cite{BRT09}. In practice, one typically sets $c,\gamma$ to 1.1, 0.5, respectively; $\Lambda$ can be estimated easily via simulation. Furthermore, one must estimate the structural noise level $\sd$; \cite{BCH11} provide an iterative algorithm for this in their Appendix A. In the sequel, we refer, as do \cite{BCH11}, to Lasso estimators with tuning parameters informed by true and estimated structural noise levels as infeasible and feasible Lasso estimators, respectively. \cite{BCCH12} introduce a tuning parameter regime for the feasible Lasso in the case of non-Gaussian, heterscedastic structural noise. We will not consider their procedure here. 
+
+
 
 
 

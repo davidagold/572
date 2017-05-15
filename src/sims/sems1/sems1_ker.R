@@ -9,10 +9,10 @@ library(glmnet)
 library(flare)
 
 # Approximation of Lambda defined in eq (3.10), p8
-Lambdahat <- function(X, t = .05, m = 1000){
+.Lambdahat <- function(X, t = .05, m = 500){
   n <- nrow(X)
   g <- rnorm(n * m, 0, 1)
-  map(1:m, ~ (X * rnorm(m, 0, 1)) %>% 
+  map(1:m, ~ (X * rnorm(n, 0, 1)) %>% 
         apply(2, sum) %>% 
         max) %>%
     as.numeric %>%
@@ -20,28 +20,48 @@ Lambdahat <- function(X, t = .05, m = 1000){
 }
 
 # .lambda <- function(sigma0hat, n, p, t = .05, c = 1.1) { 2 * sqrt(n) * c * sigma0hat * qnorm(1-(t/(2*p))) }
-.lambda <- function(sigma0hat, X, t = 0.05, c = 1.1) {  2 * c * sigma0hat * Lambdahat(X, t = t) }
+.lambda <- function(sigma0hat, X, t = 0.05, c = 1.1) {  2 * c * sigma0hat * .Lambdahat(X, t = t) }
 
 # Compute sigma0hat using iterative procedure described in Algorithm 1, p35
 .sigma0hat <- function(Y, X, t = .05, c = 1.1, psi = .1, K = 100){
   n <- nrow(X)
   p <- ncol(X) + 1
-  sigma0hat_k0 <- -Inf
+  # sigma0hat_k0 <- psi * sd(Y)
+  Lambdahat <- .Lambdahat(X, t = t)
+  sigma0hat_k0 <- Inf
   sigma0hat_k1 <- psi * sd(Y)
-  nu <- sigma0hat_k1
+  nu <- .2 * sd(Y)
   # sigma0hats <- numeric(K)
   k <- 1
+  fit <- glmnet(X, Y)
   while ( abs(sigma0hat_k1 - sigma0hat_k0) > nu & k < K ) {
-    lambda <- .lambda(sigma0hat_k1, X)
-    # lambda <- .lambda(sigma0hat_k1, n, p, t = t)
-    fit <- glmnet(X, Y)
     sigma0hat_k0 <- sigma0hat_k1
+    lambda <- 2 * c * sigma0hat_k1 * Lambdahat
     sigma0hat_k1 <- (predict(fit, X, s = lambda/n, exact = TRUE, x = X, y = Y) - Y) %>% sd
-    # sigma0hats[k] <- sigma0hat_k1
     k <- k + 1
-    # print(sigma0hat_k1)
+    print(sigma0hat_k1)
   }
-  sigma0hat_k1
+  # # sigma0hat_k1
+  # fit <- glmnet(X, Y)
+  # sdhats <- predict(fit, X) %>% 
+  #   data.frame %>%
+  #   tibble::rownames_to_column(var = "obs") %>%
+  #   mutate(y = Y) %>%
+  #   gather(lambda, yhat, everything(), -obs, -y) %>% 
+  #   group_by(lambda) %>%
+  #   summarize(sdhat = sqrt(mean((yhat - y)^2))) %>%
+  #   { .$sdhat }
+  # 
+  # k <- 1
+  # k0 <- Inf
+  # k1 <- sdhats[k]
+  # nu <- .01
+  # while ( abs(k1 - k0) > nu & k < K ) {
+  #   k <- k + 1
+  #   k0 <- k1
+  #   k1 <- sdhats[k]
+  # }
+  # k1
 }
 
 .Y <- function(n, X, beta0, gs){
@@ -131,6 +151,7 @@ sim <- function(t){
                          s = lambda/n, exact = TRUE, x = X, y = Y) %>% 
       as.numeric
     
+    print(IL_betahat)
     trial[(r+1):(r+p)] <- t
     sigma0_[(r+1):(r+p)] <- sigma0
     estimator[(r+1):(r+p)] <- "Iter-Lasso"
@@ -189,6 +210,14 @@ sim <- function(t){
   )
 }
 
-# d <- sim(1)
+d <- sim(1)
 # d %>%
 #   filter(is.na(betahat_j))
+
+d1 <- predict(fit, X) %>% 
+  data.frame %>%
+  tibble::rownames_to_column(var = "obs") %>%
+  mutate(y = Y) %>%
+  gather(lambda, yhat, everything(), -obs, -y) %>% 
+  group_by(lambda) %>%
+  summarize(sdhat = sqrt(mean((yhat - y)^2)))
