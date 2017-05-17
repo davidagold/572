@@ -255,7 +255,7 @@ In this section, we briefly illustrate how confounding bias arises from the conf
 \ee
 where $\W\in\R^\pw$ are further covariates that influence $Y$. One possible quantity of interest is $\eft = \pdd{}{x}\E[Y\,|\,x]$, where the reference population is considered under a hypothetical intervention in which $X$ is set to $x$ at the discretion of the analyst. Given that, under such a hypothetical intervention, assignment of the treatment $X$ is independent of $\W$, the parameter of interest $\eft$ is equal to $\gb$. However, under actual circumstances, $X$ may be associated with $\W$ and measurements of the latter may be unavailable. In such cases, estimating $\eft$ by na\"ively fitting the model $\E[Y\,|\,x] = \gb^\dagger x$ incurs a well-known bias that, in general, is not alleviated by asymptotics.
  
-The method of instrumental variables addresses the foregoing issues by introducing \emph{instrumental variables} $\Z$ associated with $X$ through the conditional mean function $\E[X\,|\,\z]$ but otherwise unassociated with the response $Y$. In turn, $X$ is allowed to be \emph{endogenous} --- that is, to have nontrivial covariance with the response error. The endogeneity of $X$ reflects the influence of unmeasured confounders. Intuitively, the method of instrumental variables circumvents confounding bias by studying the variation in the response relative to the ``part'' of variation in the treatment that is due only to the effect of the instruments. 
+The method of instrumental variables addresses the foregoing issues by introducing \emph{instrumental variables} $\Z$ associated with $X$ through the conditional mean function $\E[X\,|\,\z]$ but otherwise unassociated with the response $Y$. In turn, $X$ is allowed to be \emph{endogenous} --- that is, to have nontrivial covariance with the response error. (In the sequel, we sometimes abuse terminology and refer to objects associated with $X$ --- for instance, a regression function or the treatment effect --- as ``endogenous.'') The endogeneity of $X$ reflects the influence of unmeasured confounders. Intuitively, the method of instrumental variables circumvents confounding bias by studying the variation in the response relative to the ``part'' of variation in the treatment that is due only to the effect of the instrumental variables. 
 
 %Whether it is reasonable to assume that proposed instruments for a given treatment effect satisfy the foregoing conditions depends on theoretical or scientific knowledge of the mechanism or population under study. 
 %An example is \cite{AK91}, who apply the method of instrumental variables to estimate of the effect of years of schooling on income later in life. Prima facie, it is possible that unmeasured variables that reflect innate academic ability may be associated with both years of schooling and adult income.  
@@ -270,11 +270,16 @@ Apart from the foregoing motivation, the present essay focuses exclusively on th
 %
 % INFERENCE
 
-\subsection{Inference}\label{ss:inf}
+\subsection{Inference for IV models}\label{ss:inf}
 
-Inference for the treatment effect in an IV model proceeds by fitting the observed responses $Y_i$ to estimates $\Ehat[X_i\,|\,\z_i]$. In linear IV models, the simplest implementation of this procedure is \emph{Two-Stage Least Squares (2SLS)} regression of the treatment $X$ on the instruments $\Z$ in the first stage and $Y$ on the estimates $\Ehat[X\,|\,\z]$ in the second stage. Small and large sample properties of the 2SLS have been extensively researched since the 1950s, particularly to the end of alleviating the bias incurred by introducing ``many instruments'' --- that is, letting the number $\pz$ of instruments grow with the sample size $n$. Early work in this vein concerned the \emph{Limited Information Maximum Likelihood (LIML) estimator} \todo{comment on LIML -- I'm still working through the literature on this}. 
+Inference for the treatment effect in linear IV models is often conducted by fitting the observed responses $Y_i$ to estimates $\Ehat[X_i\,|\,\z_i]$. The simplest implementation of this procedure is \emph{two-stage least squares (2SLS)} regression of the treatment $X$ on the instrumental variables $\Z$ in the first stage and $Y$ on the estimates $\Ehat[X\,|\,\z]$ in the second stage. Early studies of the 2SLS estimator include \cite{T53}, \cite{B57}, \cite{S58}. Such studies tended to consider the 2SLS estimator in a generalized method of moments (GMM) context; the 2SLS estimator can be motivated by the assumption that the instrumental variables and the second-stage errors have zero covariance. 
 
-\cite{F77} studies a modification of the LIML estimator that has finite moments and bias of order of $n^{-2}$ \todo{comment on issues concerning standard error estimates of Fuller estimator}. \cite{B94} proposes similarly modified estimators and obtains corrected standard errors for asymptotic approximations under a particular sequence of model parameters in which $\pz$ may satsify $\lim_{n\to\infty} \pz/n > 0$ --- a condition that entails inconsistency of the 2SLS estimator under reasonable assumptions. More recently, \cite{HHN08} extend the result of \cite{B94} to the case of non-Gaussian errors. \cite{BW11} give an accessible survey of approximations to the finite sample bias of the 2SLS estimator in the case of a single endogenous covariate $X$. 
+Early treatments of IV models, such as the aforementioned, occurred in the context of simultaneous equations modeling. \cite{AR50} studied the maximum likelihood estimator of the regression parameters of a single equation in a system of linear equations --- the so-called \emph{limited information maximum likelihood (LIML) estimator}. The authors studied the LIML estimator's asymptotic properties via an approximation that is essentially the 2SLS estimator, though the latter was not their primary object of study. Such an approximation demonstrates $\sqrt{n}$-consistency and asymptotic efficiency of both estimators for linear IV models.
+
+The finite-sample properites of such estimators are noteworthy. \cite{MS72} demonstrate via a study of its exact finite-sample distribution that, for IV models with Gaussian errors and a single endogenous variable other than the response, the LIML estimator does not possess moments. \cite{F77} proposes a class of modified LIML estimators that do possess moments and demonstrates that one such estimator has bias on the order of $n^{-2}$. The standard error estimates suggested by asymptotic approximations for this class of estimators tend to be anti-conservative. \cite{B94} studies similarly modified estimators and obtains corrected standard errors for asymptotic approximations under a particular sequence of model parameters in which $\pz$ may satsify $\lim_{n\to\infty} \pz/n > 0$ --- a condition that entails inconsistency of the 2SLS estimator under reasonable assumptions (see \cite{BW11}).  More recently, \cite{HHN08} extend the results of \cite{B94} to the case of heteroscedastic, non-Gaussian errors.
+
+The presently studied paper, \cite{BCH11}, considers IV models in which regression functions for the endogenous variables may be nonlinear.  \cite{A74}, \cite{A77}, \cite{H82} and \cite{C87} study the asymptotic properties of estimators for nonlinear or nonparametric endogenous regression functions. Such estimators are implicit solutions to optimization problems whose objective functions depend on generic functions --- called \emph{instruments} --- of the instrumental variables. The instruments feature in the asymptotic variance of such estimators, hence the optimality of instruments can be considered in terms of relative asymptotic efficiency. The aforementioned works characterize the optimal instruments as functions of the conditional expectations of the endogenous variables given the instrumental variables. Thus, methods for nonparametric regression come to bear on inference for general IV models. For instance, \cite{N90} studies the use of nearest neighbor and series approximation --- in which an unknown regression function is estimated by an expansion of its argument into a series of basis terms --- to optimal inference in nonlinear IV models. In Section \ref{s:methods}, we will see that \cite{BCH11} extend such use of series estimation by leveraging the model selection capacity of $\ell_1$-regularized estimators of the endogenous regression function. To that end, we introduce notation. 
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -297,8 +302,8 @@ Inference for the treatment effect in an IV model proceeds by fitting the observ
 \newcommand{\B}{\bs{B}}
 \newcommand{\ip}[3]{#3\langle#1,#2 #3\rangle}
 
-For $p\in\N$, we let $[p] := \{1,\ldots,p\}$. We let bold and non-bold lowercase letters denote vectors and scalars, respectively; we use bold uppercase letters to denote matrices. We typically denote the components of a vector (matrix) by the non-bold (lowercase) counterpart of the letter that denotes the vector (matrix). If $\Z = (z_{ij})_{i,j\in[n]\times[p]}$, we use a superscript to refer to columns $\z^j = (z_{ij})_{i\inn}$ and a subscript to refer to rows $\z_i = (z_{ij})_{j\in[p]}$. We let $\|\cdot\|_p$ denote the usual $\ell_p$ norm over Euclidean spaces.  For $\u \in \R^p$, we let $\supp(\u) := \{j\in[p]: u_j \neq 0\}$ and $\|\u\|_0 = |\supp(\u)|$; we let $\|\u\|_\infty = \max_{j\in[p]} \{u_j\}$. We let $\otimes$ denote the Kronecker product and write $\u^{\kpt} = \u \kp \u$ for $\u\in\R^p$; for conformal matrices $\B$ we write $\|\u\|_{\B} = \ip{\u}{\B\u}{}$. If $x$ is a (random or deterministic) quantity indexed by $i\inn$, we let $\Exn[x_i] = n^{-1}\sum_{i=1}^n x_i$; we let $\En = \E\circ\Exn$ denote the ``average expectation'' operator. For $a,b\in\R$, we let $a\vee b = \max\{a,b\}$ and $a\wedge b = \min\{a,b\}$. We write $a_n \lesssim b_n$ if $a_n \leq Cb_n$ for a universal constant $C$; we write $a_n \lesssim_\Prb b_n$ if $a_n = O_\Prb(b_n)$. We say that an event $\event \equiv \event_n$ occurs with high probability if $\lim_{n\to\infty} \Prb \, \event = 1$. 
-
+For $p\in\N$, we let $[p] := \{1,\ldots,p\}$. We let bold and non-bold lowercase letters denote vectors and scalars, respectively; we use bold uppercase letters to denote matrices. We typically denote the components of a vector (matrix) by the non-bold (lowercase) counterpart of the letter that denotes the vector (matrix). If $\Z = (z_{ij})_{i,j\in[n]\times[p]}$, we use a superscript to refer to columns $\z^j = (z_{ij})_{i\inn}$ and a subscript to refer to rows $\z_i = (z_{ij})_{j\in[p]}$. We let $\|\cdot\|_p$ denote the usual $\ell_p$ norm over Euclidean spaces.  For $\u \in \R^p$, we let $\supp(\u) := \{j\in[p]: u_j \neq 0\}$ and $\|\u\|_0 = |\supp(\u)|$; we let $\|\u\|_\infty = \max_{j\in[p]} \{u_j\}$. We let $\otimes$ denote the Kronecker product and write $\u^{\kpt} = \u \kp \u$ for $\u\in\R^p$; for conformal matrices $\B$ we write $\|\u\|_{\B} = \ip{\u}{\B\u}{}$. If $x$ is a (random or deterministic) quantity indexed by $i\inn$, we let $\Exn[x_i] = n^{-1}\sum_{i=1}^n x_i$. For $a,b\in\R$, we let $a\vee b = \max\{a,b\}$ and $a\wedge b = \min\{a,b\}$. We write $a_n \lesssim b_n$ if $a_n \leq Cb_n$ for a universal constant $C$; we write $a_n \lesssim_\Prb b_n$ if $a_n = O_\Prb(b_n)$. We say that an event $\event \equiv \event_n$ occurs with high probability if $\lim_{n\to\infty} \Prb \, \event = 1$. 
+%we let $\En = \E\circ\Exn$ denote the ``average expectation'' operator
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -341,7 +346,7 @@ For $p\in\N$, we let $[p] := \{1,\ldots,p\}$. We let bold and non-bold lowercase
 \newcommand{\fhc}{\hat{f}}
 \newcommand{\ffb}{\bs{f}_{\regb}}
 
-\section{Methods}
+\section{Methods}\label{s:methods}
 
 In Section \ref{ss:inf}, we discussed how IV and PL models come to bear on econometrics research. Efficient inference for both models requires accurate estimation of nonparametric regression functions such as in the $n$-indexed sequence of models
 \be\label{eq:mod1}
@@ -349,7 +354,7 @@ In Section \ref{ss:inf}, we discussed how IV and PL models come to bear on econo
 \ee
 where for each $i\in[n]$, $y_i \in \R$ is a response, $\u_i = (u_1,\ldots,u_{\pu}) \in \Us \subseteq \R^{\pu}$ for $\pu \equiv \pun$ are exposures, $\ersi \sim \Normal(0,\sd^2)$ with $\sd \equiv \sd_n$, and $f \equiv f_n : \Us \to \R$ is the target regression function. For brevity, we write $f_i := f(\u_i)$. 
 
-In particular, efficient estimation of the treatment effect in the IV model depends crucially on consistently estimating the conditional means of the endogenous variables given the instrumental variables; see \cite{A74}, \cite{N90}. In turn, it is important to identify conditions under which such estimation is possible. 
+In particular, efficient estimation of the treatment effect in the IV model depends crucially on consistent estimation of the conditional means of the endogenous variables given the instrumental variables; see \cite{A74}, \cite{N90}. In turn, it is important to identify conditions under which such estimation is possible. 
 
 
 
@@ -363,7 +368,7 @@ One strategy is to suppose that there exist transformations $\z_i \equiv \z_i(\u
 
 Note that the aforementioned model is correct only up to the approximation errors $\remi \equiv \remi(\regb) := f(\u_i) - \fb(\z_i)$ for $i\inn$. Let $\rb$ denote the rate (up to order) of the scaled $\ell_2$ approximation error of $\fb$, so that the $\remi$ satisfy $\Exn^{1/2}[r_i] \lesssim_\Prb \rb$. Given an approximation rate $\rb$ and a sequence of such estimators $\regbh$, it is natural to ask: (i) how well do the $\regbh$ estimate $\regb$ despite such approximation error, and (ii) how well do the resultant $\fbhat$ estimate $f$? 
 
-In well-known results, \cite{N97} answers such questions for linear $\fb$ under certain conditions on the smoothness of $f$ and the series terms $\z(\u)$. In particular, \cite{N97} studies $f$ for which there exist sequences of approximating $\regb$ such that the maximum partial derivatives of the approximation errors $\remi$ are of the order $\pz^{-\ga}$ for some $\ga > 0$. For such $f$, and for series terms $\z^j$ with well-behaved covariance matrices and which satisfy $\lim_{n\to\infty} \zeta(\pz)^2\pz/n = 0$, where $\zeta(\pz)$ is a bound on the magnitude of the series terms, \cite{N97} derives the following bound on the mean-squared error of the corresponding series estimator $\fhc$
+In well-known results, \cite{N97} answers such questions for linear $\fb$ under certain conditions on the smoothness of $f$ and the series terms $\z(\u)$. In particular, \cite{N97} studies $f$ for which there exist sequences of approximating $\regb$ such that the maximum partial derivatives of the approximation errors $\remi$ are of the order $\pz^{-\ga}$ for some $\ga > 0$. For such $f$, and for series terms $\z^j$ with well-behaved covariance matrices and which satisfy $\lim_{n\to\infty} \zeta(\pz)^2\pz/n = 0$, where $\zeta(\pz)$ is a bound on the magnitude of the series terms, \cite{N97} derives the following bound on the mean-squared error of the corresponding series estimator $\fhc \equiv \fhc_{\regb}$
 \benn
 	\int_{\Us} \{\fhc(\z(\u)) - f(\u)\}^2 dF(\u) \ = \ O_\Prb(\pz/n + \pz^{-2\ga}) \,.
 \eenn
@@ -375,12 +380,12 @@ For our purposes, it is relevant to note that the requirement that $\lim_{n\to\i
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % IV SELECTION
-\subsection{Selection of instrumental variables}
+\subsection{Selection of series terms}
 \renewcommand{\P}{\bs{P}}
 
-The effectiveness of series estimation requires good selection of series terms. Unfortunately, the aforementioned results say nothing about methods for empirical selection of the latter. One reasonable approach, as suggested by \cite{A74} and \cite{K71}, is simply to include ``lower-order'' polynomial transformations of the instrumental variables $\u^j$, $j\in[\pu]$, so that the number of terms increases modestly with $n$. Prima facie, there is ``room'' between the growth rate limits on the number of series terms $\pz$ imposed by, say, \cite{N97}, and the sequences $\pz$ that satisfy $\pz/n \to \ga \in [0, \infty)$ that can be handled by the estimators considered in, say, \cite{B94} and \cite{HHN08}. However, \cite{H02} notes, the limiting distributions of the latter estimators may depend on $\ga$ and thereby may not reach the efficiency bound entailed by the former's convolution theorem. 
+The effectiveness of series estimation requires good selection of series terms. Unfortunately, the aforementioned results say nothing about methods for empirical selection of the latter. One reasonable approach, as suggested by \cite{A74} and \cite{K71}, is simply to include ``lower-order'' polynomial transformations of the instrumental variables $\u^j$, $j\in[\pu]$, so that the number of terms increases modestly with $n$. Prima facie, there is ``room'' between the growth rate limits on the number of series terms $\pz$ imposed by, say, \cite{N97}, and the sequences $\pz$ that satisfy $\pz/n \to \ga \in [0, \infty)$ that can be handled by the estimators considered in, say, \cite{B94} and \cite{HHN08}. However, as \cite{H02} notes, the limiting distributions of the latter estimators may depend on $\ga$ and thereby may not reach the efficiency bound entailed by the former's convolution theorem. 
 
-It would be unfortunate if, in order accommodate the many instrumental variables required to achieve efficiency, one needed to use estimators for which such efficiency gains are irrelevant. Indeed, \cite{H02} cites \cite{N97} as evidence that a parsimonious set of series terms $\z^j$ is preferable to a set ``many instrumental variables''. The former suggests a high-level condition that requires the existence of a projection matrix $\P$ close to that associated with $\Z$ but which satisfies $\rank \P = o(\sqrt{n})$. If a number of columns $\z^j$ on this desired order ``well-approximated'' (the image of) $\Z$, then one could use the projection associated with the matrix formed by such columns. This observation, though heuristic in nature, further highlights variable selection as a missing ingredient for effient estimation in the context of IV models.
+It would be unfortunate and ironic if, in order accommodate the many instrumental variables required to consistently estimate the conditional expectations of the endogenous variables, one needed to use estimators that accrue no efficiency gains for the effort. Indeed, \cite{H02} cites \cite{N97} as evidence that a parsimonious set of series terms $\z^j$ is preferable to a set ``many instrumental variables''. The former suggests a high-level condition that requires the existence of a projection matrix $\P$ close to that associated with $\Z$ but which satisfies $\rank \P = o(\sqrt{n})$. Per \cite{H02}, if a number (of the desired order) of columns $\z^j$ ``well-approximated'' (the image of) $\Z$, then one could use the projection associated with the matrix formed by such columns to form an efficient estimator of the treatment effect. This observation, though heuristic in nature, further highlights variable selection as a missing ingredient for effient estimation in the context of IV models.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -389,7 +394,7 @@ It would be unfortunate if, in order accommodate the many instrumental variables
 \subsection{Approximate sparsity}
 
 
-The previous section highlighted a tension between the objectives of, one the one hand, including sufficiently many instrumental variables (or transformations thereof) in one's first-stage regression in order to accurately estimate the conditional means of the endogenous variables and, on the other hand, including sufficiently few instrumental variables so as not to negate any putative efficiency gains. The primary contribution of the presently studied paper is to use $\ell_1$-regularized estimation in the first-stage to reconcile these competing objectives. 
+The previous section presented a tension between the objectives of, one the one hand, including sufficiently many instrumental variables (or transformations thereof) in one's first-stage regression in order to accurately estimate the conditional means of the endogenous variables and, on the other hand, including sufficiently few instrumental variables so as not to negate any putative efficiency gains. The primary contribution of the presently studied paper, \cite{BCH11}, is to use $\ell_1$-regularized estimation in the first-stage to reconcile these competing objectives. 
 
 We saw in Section \ref{ss:se} that rates of convergence for series estimators can be derived by imposing differentiability restrictions on the approximation errors $\remi$. \cite{BCH11} give similar results for linear $\fb$ that depend sparsely on their arguments. If, for a sequence $\sb \equiv \sb_n$ and the approximation rate $\rb = \sd\sqrt{\sb/n}$, there exists a sequence of $\fb$ each belonging to the respective family
 \benn%\label{def:fams}
@@ -406,24 +411,31 @@ satisfies $\|\regbh - \regb\|_{\gramhat} \lesssim_\Prb \sd\sqrt{s\log(\pz\vee n)
 \end{align}
 where $\ffb := (\fb(\z_i))_{i\inn}$. Under the typical assumptions that $\sd = O(1)$ and $\sb = o(n/\log\pz)$, the right-hand side above is~$o(\sqrt{n})$, which entails that $\fhat$ achieves ``consistency'' in (scaled) $\ell_2$-norm. The foregoing considerations suggest the following characterization of such models.
 
-\begin{defi}[Approximate sparsity]\label{def:as} Given a sequence of models of the form \eqref{eq:mod1} and respective observations $(y_i, \u_i)_{i\inn} \in \R^{1\times\pu}$, we say that the regression functions $f$ are \emph{approximately sparse} relative to a sequence of transformations $\z \equiv \z_n(\u)$, where the $\z^j$ are considered fixed and scaled so that $\|\z^j\|_2 = \sqrt{n}$, and a sequence of approximating functions $\fb \equiv \fbn \in \fams$ for $\sb \equiv \sb_n$ if (i) $\sb = o(n/\log\pz)$ and (ii) the approximation errors $\remi(\regb)$ for $i\inn$ satisfy $\Exn^{1/2}[\remi^2] \lesssim \sd\sqrt{\sb/n}$.
+\begin{defi}\label{def:as}[Approximate sparsity] Given a sequence of models of the form \eqref{eq:mod1} and respective observations $(y_i, \u_i)_{i\inn} \in \R^{1\times\pu}$, we say that the regression functions $f$ are \emph{approximately sparse} relative to a sequence of transformations $\z \equiv \z_n(\u)$, where the $\z^j$ are considered fixed and scaled so that $\|\z^j\|_2 = \sqrt{n}$, and a sequence of approximating functions $\fb \equiv \fbn \in \fams$ for $\sb \equiv \sb_n$ if (i) $\sb = o(n/\log\pz)$ and (ii) the approximation errors $\remi(\regb)$ for $i\inn$ satisfy $\Exn^{1/2}[\remi^2] \lesssim \sd\sqrt{\sb/n}$.
 \end{defi}
 
 \begin{rek} That a sequence of regression functions is approximately sparse is equivalent to that Condition ASM of \cite{BCH11} holds. Our choice of presentation is motivated by concerns for clarity of the order of logical quantification over the different model parts. 
 \end{rek}
 
-\begin{rek} As \cite{BCH11} consider fixed instrumental variables $\z^j$, they present their approximation error rate as a deterministic bound, in contrast to the MSE rate produced by \cite{N97}. \cite{BCCH12} consider the case of random $\z^j$ and hence present approximate sparsity in terms of a probabilistic bound on the empirical approximation error. 
+\begin{rek} As \cite{BCH11} consider fixed instrumental variables $\z^j$, the remainders $\remi$ are not stochastic quantities; hence the deterministic rate condition of Definition \ref{def:as}. This contrasts with the setting of \cite{N97}. \cite{BCCH12} consider random $\z^j$ and hence present approximate sparsity in terms of a probabilistic bound on the empirical approximation error. 
 \end{rek}
 
-The upshot of Definition \label{def:as} is that one may apply modern statistical learning techniques to estimate an approximately sparse regression function at a near-oracle rate without any prior knowledge of which series terms ought to be included in the model. In the IV context, this benefit generalizes to the situation in which many instrumental variables are immediately available, say as levels of a large factor. By using $\ell_1$-regularized estimation methods, we needn't necessarily be caught between large finite-sample bias due to the use of many instrumental variables and asymptotic inefficiency due to corrections for the former.  
+As we will codify in the next section, the upshot of Definition \ref{def:as} is that one may apply modern statistical learning techniques to estimate an approximately sparse regression function at a near-oracle rate without any prior knowledge of which series terms ought to be included in the model. In the IV context, this benefit generalizes to the situation in which many instrumental variables are immediately available, say as levels of a large factor. By using $\ell_1$-regularized estimation methods, we needn't necessarily be caught between large finite-sample bias due to the use of many instrumental variables and asymptotic inefficiency due to corrections for the former.  
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % 
 \subsection{Lasso estimation}
+\newcommand{\minse}{\phi_{\mathrm{min}}}
+\newcommand{\maxse}{\phi_{\mathrm{max}}}
+\newcommand{\cminse}{\kappa_*}
+\newcommand{\cmaxse}{\kappa^*}
+\newcommand{\M}{\bs{M}}
+\newcommand{\gd}{\delta}
+\newcommand{\diff}{\bs{\gd}}
 
-In this section we briefly review the conditions that lead to good performance for Lasso estimators. There two primary ingredients: (i) suitable choice of the tuning parameter $\tune$, and (ii) conditions on the empirical gram matrix $\gramhat = \Exn[\z_i^{\kpt}]$. The most widely cited oracle rates for the Lasso estimator fit to a model such as that of \eqref{eq:mod1} require that the tuning parameter dominate the ``noise'' term $\|\Exn[\z_i\ersi]\|_\infty$. For Gaussian $\ersi$, \cite{BC13} one may achieve as much with high probability by setting
+In this section, we briefly review the conditions that lead to good performance for Lasso estimators. There two primary ingredients: (i) suitable choice of the tuning parameter $\tune$, and (ii) conditions on the empirical Gram matrix $\gramhat = \Exn[\z_i^{\kpt}]$. Well-known oracle rates for the Lasso estimator fit to a model such as that of \eqref{eq:mod1} require that the tuning parameter dominate the ``noise'' term $\|\Exn[\z_i\ersi]\|_\infty$. For Gaussian $\ersi$, \cite{BC13} achieve as much with high probability by setting
 \be\label{tune1}
 %	\tune \ \geq \ 2 c \sd \Phi^{-1}(1-\gamma/2\pz)\,,
 	\tune \ = \ 2 c \sd \Lambda(1-\gamma\,|\,\Z)\,,
@@ -433,11 +445,32 @@ where $c, \gamma$ are controlled tolerances and
 	\Lambda(1 - \gamma\,|\,\Z) \ & := \ (1-\gamma)\text{-quantile of } n\|\Exn[\z_ig_i]\|_\infty\\
 	& \leq \ \sqrt{n}\Phi^{-1}(1-\gamma/2\pz) \ \leq \ \sqrt{2n\log(2\pz/\gamma)} \,,
 \end{align*}
-where $g_i \sim_{iid} \Normal(0,1), i\in[n]$ and the estimate of the right-hand side above figures into the tuning parameter suggestion by \cite{BRT09}. In practice, one typically sets $c,\gamma$ to 1.1, 0.5, respectively; $\Lambda$ can be estimated easily via simulation. Furthermore, one must estimate the structural noise level $\sd$; \cite{BCH11} provide an iterative algorithm for this in their Appendix A. In the sequel, we refer, as do \cite{BCH11}, to Lasso estimators with tuning parameters informed by true and estimated structural noise levels as infeasible and feasible Lasso estimators, respectively. \cite{BCCH12} introduce a tuning parameter regime for the feasible Lasso in the case of non-Gaussian, heterscedastic structural noise. We will not consider their procedure here. 
+where $g_i \sim_{iid} \Normal(0,1), i\in[n]$ and the estimate of the right-hand side above features in the tuning parameter suggestion by \cite{BRT09}. In practice, one typically sets $c,\gamma$ to 1.1, 0.5, respectively; $\Lambda$ can be estimated easily via simulation. Furthermore, one must estimate the structural noise level $\sd$; \cite{BCH11} provide an iterative algorithm for this in their Appendix A. In the sequel, we refer, as do \cite{BCH11}, to Lasso estimators with tuning parameters informed by true and estimated structural noise levels as infeasible and feasible Lasso estimators, respectively. \cite{BCCH12} introduce a tuning parameter regime for the feasible Lasso in the case of non-Gaussian, heterscedastic structural noise. We do not consider their procedure here. 
 
+The aforementioned rates also required good behavior of certain moduli of continuity of the empirical Gram matrix. This condition appears in different forms in the literature --- for instance, the compatibility condition or restricted eigenvalues condition. \cite{BCH11} introduce it in terms of the minimal and maximal $m$-sparse eigenvalues of a semidefinite matrix $\M \in \R^{q \times q}$, defined respectively as
+\benn
+	\minse(m; M) \ := \ \min_{\substack{\diff\,\in\,\R^q\setminus\{\bs{0}\} \,: \\ \|\diff\|_0 \,\leq\, m}} \frac{\|\diff\|_{\M}}{\|\diff\|_2^2}\,, \qquad\qquad
+	\maxse(m; M) \ := \ \max_{\substack{\diff\,\in\,\R^q\setminus\{\bs{0}\} \,: \\ \|\diff\|_0 \,\leq\, m}} \frac{\|\diff\|_{\M}}{\|\diff\|_2^2}\,.
+\eenn
 
+\begin{defi}[Sparse eigenvalues condition]
+We say that the sequence of design matrices $\Z \equiv \Z_n$ with empirical Gram matrices $\gramhat$ satisfies the \emph{sparse eigenvalues (SE) condition} if there exists an unbounded sequence $h_n$ and finite universal constants $\cminse, \cmaxse > 0$ that satisfy
+\benn
+	\cminse \ \leq \minse(h_n s; \gramhat) \ \leq \ \maxse(h_n s; \gramhat) \ \leq \ \cmaxse \,.
+\eenn
+\end{defi}
 
+The following adaptation of \cite[Theorem 1]{BC13}, which is in turn an extension of the work of \cite{BRT09}, demonstrates that the order of estimation and prediction error of the (feasible) Lasso does not suffer under the assumption of approximately sparse regression functions $f$.
 
+\begin{thm}[{\cite[Theorem 1]{BCH11}}]\label{thm:1}
+Let $(y_i, \u_i)_{i\inn} \in \R^{1\times\pu}$ be distributed according an $n$-indexed sequence of models of \eqref{eq:mod1}, and suppose that (i) the respective sequence regression functions $f$ are approximately sparse with respect to transformations $\z \equiv \z_{,n}(\u)$ and approximation parameters $\regb$; (ii) condition SE holds. Then, for $n$ sufficiently large, the (feasible) Lasso estimator $\regbh$ fit to the model $\E[y_i\,|\,\z_i] = \ip{\z_i}{\regb}{}$ satisfies the following with probability at least $1-\gamma$:
+\benn
+	C_1\|\regbh - \regb\|_2 \ \leq \ \|\regbh-\regb\|_{\gramhat} \ \leq \ C_2 \sd \sqrt{s\log(2\pz/\gamma)/n} \,,
+\eenn
+where $C_1, C_2 > 0$ satisfy $C_1 \gtrsim \sqrt{\cminse}$ and $C_2 \lesssim 1/\sqrt{\cminse}$, and $\log(\pz/\gamma) \lesssim \log(\pz\vee n)$. 
+\end{thm}
+
+Theorem \ref{thm:1} provides the basis for the subsequent results concerning Lasso-based inference for nonlinear IV models with approximately sparse endogenous regression functions. 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -496,7 +529,7 @@ where $\Qn \equiv \Qn(\xinst) := \En[\ainst_i(\xinsti) \kp \a_i]$, $\Omn \equiv 
 \benn
 	\var(\g) \ = \ \sds^2\Qn^{-1} \ = \ \sds^2\big(\En\big[\ainsti(d_i)^{\kpt}\big]\big)^{-1} \,,
 \eenn
-the semiparametric efficiency bound for estimating $\rega$. \todo{this exegesis is from \cite{BCCH12}; investigate further resources, e.g. \cite{A74}, \cite{C87}, \cite{N90}.} The $d_i$ are therefore regarded as \emph{optimal instruments}. In the sequel, we let unqualified use of $\ainsti$ refer to $\ainsti(d_i)$. 
+the semiparametric efficiency bound for estimating $\rega$ --- c.f. \cite{BCCH12}, \cite{A74}, \cite{C87}, \cite{N90}. The $d_i$ are therefore regarded as \emph{optimal instruments}. In the sequel, we let unqualified use of $\ainsti$ refer to $\ainsti(d_i)$. 
 
 In practice, the $d_i$ are not available and estimates $\dhati$ must be used instead. The foregoing discussion suggests that, in order for $\regaiv(\dhat)$ to achieve asymptotic efficiency, $\dhat$ must ``consistently'' estimate $\d$ at a sufficiently fast rate. The following theorem of \cite{BCH11} demonstrates that, if the regression functions $d$ are approximately sparse, then Lasso-based estimates suffice.
 
@@ -509,8 +542,7 @@ Let $(y_i, \a_i, \u_i)_{i\inn}$ be distributed according to \eqref{mod:iv} for e
 where $\|\rm\|_\infty = o_\Prb(1)$. Moreover, the result continues to hold if $\Qn$ is replaced by $\Qnhat := \Exn\big[\ainstihatkpt\big]$ and $\sds^2$ by $\sdshat^2 := \Exn\big[(y_i -\langle \ainstihat, \regaiv\rangle)^2\big]$, where $\ainstihat := \ainsti(\dhat)$. 
 \end{thm}
 
-The upshot of the foregoing theorem... 
-
+The upshot of the foregoing theorem is that nonlinear IV estimation needn't incur efficiency penalties for high-dimensional series estimation of the endogenous regression functions. 
 
 
 
