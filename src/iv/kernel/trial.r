@@ -29,7 +29,7 @@ trial <- function(res_dir) {
   .shat <- numeric(R)
   
   # Generate data
-  obs <- .obs(config_id)
+  obs <- obs.(config_id)
   y <- obs$y; x <- obs$x; Z <- obs$Z
   n <- obs$n; pz <- obs$pz
   
