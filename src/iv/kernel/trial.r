@@ -26,7 +26,8 @@ trial <- function(res_dir) {
   .estimate <- numeric(R)
   .SE <- numeric(R)
   .rmse <- numeric(R)
-  .shat <- numeric(R)
+  .shat_orig <- numeric(R)
+  .shat_mod <- numeric(R)
   
   # Generate data
   obs <- obs.(config_id)
@@ -36,10 +37,20 @@ trial <- function(res_dir) {
   # 2SLS, CV Lasso
   fit_fs <- cv.glmnet(Z, x, intercept = FALSE)
   beta0hat <- predict(fit_fs, type = "coefficients", s = "lambda.min")[2:(pz+1)] %>% as.numeric
-  Shat_CV <- which(beta0hat != 0)
-  shat_CV <- length(Shat_CV)
-  print(Shat_CV)
-  Z_ps_CV <- Z[, Shat_CV]
+  Shat_orig_CV <- which(beta0hat != 0)
+  shat_orig_CV <- length(Shat_orig_CV)
+  
+  if ( Shat_orig_CV == 0 ) {
+    noinsts_CV = TRUE
+    beta0hat <- map_int(1:length(fit_fs$lambda), ~ fit_fs$glmnet.fit$beta[,.] %>% 
+              as.numeric %>% { which(. != 0) } %>% length) %>%
+      min %>%
+      { fit_fs$glmnet.fit$beta[, .] }
+    Shat_mod_CV <- which(beta0hat != 0)
+    shat_mod_CV <- length(Shat_mod_CV)
+  } else {shat_mod_CV <- NA }
+  
+  Z_ps_CV <- Z[, Shat_mod_CV]
   fit_tsls_CV <- theta0_tsls.(y, x, Z_ps_CV)
   theta0_tsls_CV <- fit_tsls_CV$theta0_hat
   sigma0_htsls_CV <- fit_tsls_CV$sigma0_hhat
@@ -53,7 +64,8 @@ trial <- function(res_dir) {
   .estimate[r] <- theta0_tsls_CV
   .SE[r] <- SE_tsls_CV
   .rmse[r] <- rmse_tsls_CV
-  .shat[r] <- shat_CV
+  .shat_orig[r] <- shat_orig_CV
+  .shat_mod[r] <- shat_mod_CV
   
   df_est <- data.frame(
     config_id = .config_id,
