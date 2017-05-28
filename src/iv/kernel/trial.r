@@ -12,9 +12,10 @@ source("estimation.r")
 # Simulation trial
 
 trial <- function(res_dir) {
-  # obtain config and trial ids
+  # obtain config and trial ids and results directory
   args = commandArgs(trailingOnly=TRUE)
   config_id <- args[1] %>% as.numeric
+  res_dir <- args[2]
   trial_id <- Sys.getenv('SLURM_ARRAY_TASK_ID') %>% as.numeric
   
   # set up containers
