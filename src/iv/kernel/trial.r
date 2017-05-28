@@ -12,29 +12,25 @@ source("estimation.r")
 # Simulation trial
 
 trial <- function(res_dir) {
+  # obtain config and trial ids
   args = commandArgs(trailingOnly=TRUE)
-  # config_id. <- args[1] %>% as.numeric
-  trial <- Sys.getenv('SLURM_ARRAY_TASK_ID') %>% as.numeric
-  n <- 30
-  pz <- 10
-  theta0 <- 1
+  config_id <- args[1] %>% as.numeric
+  trial_id <- Sys.getenv('SLURM_ARRAY_TASK_ID') %>% as.numeric
   
-  beta0 <- map_dbl(1:pz, ~.7^(.-1))
-  
-  # Generate data
-  Z <- Z.(n, pz)
-  hv <- hv.(n, pz)
-  h <- hv$h; v <- hv$v
-  yx <- yx.(Z, h, v, beta0, theta0)
-  y <- yx$y; x <- yx$x
-  
+  # set up containers
   R <- 1
-  .trial <- numeric(R)
+  .config_id <- rep(config_id, R)
+  .trial_id <- rep(trial_id, R)
   .estimator <- numeric(R)
   .estimate <- numeric(R)
   .SE <- numeric(R)
   .rmse <- numeric(R)
   .shat <- numeric(R)
+  
+  # Generate data
+  obs <- .obs(config_id)
+  y <- obs$y; x <- obs$x; Z <- obs$Z
+
   
   # 2SLS, CV Lasso
   fit_fs <- cv.glmnet(Z, x, intercept = FALSE)
@@ -50,32 +46,31 @@ trial <- function(res_dir) {
   print(var_theta0_tsls_CV)
   
   SE_tsls_CV <- diag(var_theta0_tsls_CV) * n %>% sqrt
-  print(SE_tsls_CV)
+  rmse_tsls_CV <- (y - x %*% theta0_tsls_CV)^2 %>% mean %>% sqrt
   
   r <- 1
-  .trial[r] <- .trial
   .estimator[r] <- "IV-Lasso-CV"
   .estimate[r] <- theta0_tsls_CV
   .SE[r] <- SE_tsls_CV
-  
-  rmse_tsls_CV <- (y - x %*% theta0_tsls_CV)^2 %>% mean %>% sqrt
   .rmse[r] <- rmse_tsls_CV
   .shat[r] <- shat_CV
   
   df_est <- data.frame(
-    trial = .trial,
+    config_ig = .config_id,
+    trial_id = .trial_id,
     estimator = .estimator,
     estimate = .estimate,
     SE = .SE
   )
   df_stats <- data.frame(
-    trial = .trial,
+    config_id = .config_id,
+    trial_id = .trial_id,
     estimator = .estimator,
     rmse = .rmse,
     shat = .shat
   )
   
   # list(df_est = df_est, df_stats = df_stats)
-  write.csv(df_est, paste(res_dir, "/est/est", trial, ".csv", sep=""))
-  write.csv(df_stats, paste(res_dir, "/stats/stats", trial, ".csv", sep=""))
+  write.csv(df_est, paste(res_dir, "/", config_id, "/est/est", trial, ".csv", sep=""))
+  write.csv(df_stats, paste(res_dir, "/", config_id, "/stats/stats", trial, ".csv", sep=""))
 }
