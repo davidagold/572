@@ -44,7 +44,6 @@ trial <- function(res_dir) {
   theta0_tsls_CV <- fit_tsls_CV$theta0_hat
   sigma0_htsls_CV <- fit_tsls_CV$sigma0_hhat
   var_theta0_tsls_CV <- fit_tsls_CV$var_theta0_hat
-  print(var_theta0_tsls_CV)
   
   SE_tsls_CV <- diag(var_theta0_tsls_CV) * n %>% sqrt
   rmse_tsls_CV <- (y - x %*% theta0_tsls_CV)^2 %>% mean %>% sqrt
