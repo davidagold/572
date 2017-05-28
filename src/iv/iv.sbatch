@@ -10,5 +10,4 @@
 #SBATCH --mail-user=dag89@uw.edu # Email to which notifications will be sent
 #SBATCH --array=1-100
 
-config=$1
-Rscript iv.R $config
+Rscript iv.r
