@@ -18,11 +18,11 @@ test <- function(estimate, truth, SE, level = .05) {
 analyze <- function() {
   args <- commandArgs(trailingOnly = TRUE)
   res_dir <- args[1]
-  project_dir <- args[2]
+  src_dir <- args[2]
   
   df_est <- paste(res_dir, "est.csv", sep = "/") %>% read.csv
   df_stats <- paste(res_dir, "stats.csv", sep = "/") %>% read.csv
-  configs <- paste(project_dir, "src/config/configs.csv", sep = "/") %>% read.csv
+  configs <- paste(src_dir, "config/configs.csv", sep = "/") %>% read.csv
   
   df_est %>%
     inner_join(configs, by = "config_id") %>%
