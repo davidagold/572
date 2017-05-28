@@ -49,6 +49,6 @@ obs. <- function(.config_id) {
   Z <- Z.(n, pz)
   hv <- hv.(n, sigma0_h, sigma0_v, sigma0_hv)
   yx <- yx.(Z, hv$h, hv$v, beta0, theta0)
-  list(y = yx$y, x = yx$x, Z = Z)
+  list(y = yx$y, x = yx$x, Z = Z, n = n, pz = pz)
 }
 

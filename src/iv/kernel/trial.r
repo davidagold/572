@@ -31,7 +31,7 @@ trial <- function(res_dir) {
   # Generate data
   obs <- .obs(config_id)
   y <- obs$y; x <- obs$x; Z <- obs$Z
-
+  n <- obs$n; pz <- obs$pz
   
   # 2SLS, CV Lasso
   fit_fs <- cv.glmnet(Z, x, intercept = FALSE)
