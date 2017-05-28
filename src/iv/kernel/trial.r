@@ -71,6 +71,6 @@ trial <- function(res_dir) {
   )
   
   # list(df_est = df_est, df_stats = df_stats)
-  write.csv(df_est, paste(res_dir, "/", config_id, "/est/est", trial, ".csv", sep=""))
-  write.csv(df_stats, paste(res_dir, "/", config_id, "/stats/stats", trial, ".csv", sep=""))
+  write.csv(df_est, paste(res_dir, "/", config_id, "/est/est", trial_id, ".csv", sep=""))
+  write.csv(df_stats, paste(res_dir, "/", config_id, "/stats/stats", trial_id, ".csv", sep=""))
 }
