@@ -56,7 +56,7 @@ trial <- function(res_dir) {
   .shat[r] <- shat_CV
   
   df_est <- data.frame(
-    config_ig = .config_id,
+    config_id = .config_id,
     trial_id = .trial_id,
     estimator = .estimator,
     estimate = .estimate,
