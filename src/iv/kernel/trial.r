@@ -14,7 +14,7 @@ source("estimation.r")
 trial <- function(res_dir) {
   args = commandArgs(trailingOnly=TRUE)
   # config_id. <- args[1] %>% as.numeric
-  trial_id <- Sys.getenv('SLURM_ARRAY_TASK_ID') %>% as.numeric
+  trial <- Sys.getenv('SLURM_ARRAY_TASK_ID') %>% as.numeric
   n <- 30
   pz <- 10
   theta0 <- 1
