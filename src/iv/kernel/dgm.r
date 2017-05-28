@@ -13,8 +13,7 @@ suppressWarnings(library(mvtnorm))
 zeros <- function(p) rep(0, p)
 ones <- function(p) rep(1, p)
 
-Z. <- function(n, pz) {
-  Sigma_z <- .5^abs(outer(1:pz, 1:pz, "-"))
+Z. <- function(n, pz, Sigma_z) {
   Z <- rmvnorm(n, zeros(pz), Sigma_z)
   Z
 }
@@ -37,6 +36,7 @@ obs. <- function(.config_id) {
   config <- filter(configs, config_id == .config_id)
   n <- config$n; pz <- config$pz; Fstar <- config$Fstar; theta0 <- config$theta0
   
+  Sigma_z <- .5^abs(outer(1:pz, 1:pz, "-"))
   if ( Fstar == 0 ) {
     beta0 = rep(0, pz)
     sigma0_v = 1
@@ -46,7 +46,7 @@ obs. <- function(.config_id) {
   }
   sigma0_h <- 1; sigma0_hv <- .3
   
-  Z <- Z.(n, pz)
+  Z <- Z.(n, pz, Sigma_z)
   hv <- hv.(n, sigma0_h, sigma0_v, sigma0_hv)
   yx <- yx.(Z, hv$h, hv$v, beta0, theta0)
   list(y = yx$y, x = yx$x, Z = Z, n = n, pz = pz)
