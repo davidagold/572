@@ -40,23 +40,30 @@ trial <- function(res_dir) {
   Shat_orig_CV <- which(beta0hat != 0)
   shat_orig_CV <- length(Shat_orig_CV)
   
-  if ( Shat_orig_CV == 0 ) {
+  if ( shat_orig_CV == 0 ) {
     noinsts_CV = TRUE
-    beta0hat <- map_int(1:length(fit_fs$lambda), ~ fit_fs$glmnet.fit$beta[,.] %>% 
+    nz_lambda_ids <- map_int(1:length(fit_fs$lambda), ~ fit_fs$glmnet.fit$beta[,.] %>% 
               as.numeric %>% { which(. != 0) } %>% length) %>%
-      min %>%
-      { fit_fs$glmnet.fit$beta[, .] }
-    Shat_mod_CV <- which(beta0hat != 0)
+      { which(. != 0) }
+    min_nz_lambda_id <- min(nz_lambda_ids)
+    min_nz_lambda <- fit_fs$lambda[min_nz_lambda_id]
+    
+    # beta0hat_mod <- predict(fit_fs, type = "coefficients", s = min_nz_lambda)[2:(pz+1)] %>% as.numeric
+    beta0hat_mod <- fit_fs$glmnet.fit$beta[,min_nz_lambda_id] %>% as.numeric
+    Shat_mod_CV <- which(beta0hat_mod != 0)
     shat_mod_CV <- length(Shat_mod_CV)
-  } else {shat_mod_CV <- NA }
+    Z_ps_CV <- Z[, Shat_mod_CV]
+  } else {
+    shat_mod_CV <- NA
+    Z_ps_CV <- Z[, Shat_orig_CV]
+  }
   
-  Z_ps_CV <- Z[, Shat_mod_CV]
   fit_tsls_CV <- theta0_tsls.(y, x, Z_ps_CV)
   theta0_tsls_CV <- fit_tsls_CV$theta0_hat
   sigma0_htsls_CV <- fit_tsls_CV$sigma0_hhat
   var_theta0_tsls_CV <- fit_tsls_CV$var_theta0_hat
   
-  SE_tsls_CV <- diag(var_theta0_tsls_CV) * n %>% sqrt
+  SE_tsls_CV <- (var_theta0_tsls_CV * n) %>% sqrt
   rmse_tsls_CV <- (y - x %*% theta0_tsls_CV)^2 %>% mean %>% sqrt
   
   r <- 1
@@ -79,7 +86,8 @@ trial <- function(res_dir) {
     trial_id = .trial_id,
     estimator = .estimator,
     rmse = .rmse,
-    shat = .shat
+    shat_orig = .shat_orig,
+    shat_mod = .shat_mod
   )
   
   # list(df_est = df_est, df_stats = df_stats)
