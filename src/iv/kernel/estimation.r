@@ -28,7 +28,7 @@ theta0_tsls. <- function(y, x, Z) {
   theta0_hat <- num / denom
 
   sigma0_hhat <- ((y - x %*% theta0_hat)^2/(n-1)) %>% sqrt
-  SE_theta0_hat <- (sigma0_hhat / sqrt(denom)) / sqrt(n)
+  SE_theta0_hat <- (sigma0_hhat / sqrt(denom))
   
   list(theta0_hat = theta0_hat, sigma0_hhat = sigma0_hhat, 
        SE_theta0_hat = SE_theta0_hat)
