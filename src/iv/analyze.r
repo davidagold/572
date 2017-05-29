@@ -29,10 +29,18 @@ analyze <- function() {
   
   df_est %>%
     inner_join(configs, by = "config_id") %>%
+    inner_join(df_stats, by = "config_id")
     mutate(rp05 = ifelse(abs(estimate-theta0)/SE > z_star, 1, 0)) %>%
     group_by(config_id) %>% 
-    summarize(avg_rp05 = mean(rp05)) %>%
+    summarize(avg_rp05 = mean(rp05),
+              RMSE = mean((estimate-theta0)^2) %>% sqrt,
+              med_bias = quantile(estimate-theta0, .5),
+              noinsts = sum(shat_orig == 0)) %>%
+    inner_join(configs, by = "config_id") %>%
     print
 }
 
 analyze()
+# 
+# df_est <- read.csv("res/est.csv")
+# df_stats <- read.csv("res/stats.csv")
