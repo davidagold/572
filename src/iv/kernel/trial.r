@@ -24,7 +24,7 @@ trial <- function(res_dir) {
   res_dir <- args[2]
   
   # set up containers
-  R <- 2
+  R <- 3
   res <- data.frame(
     config_id = rep(config_id, R),
     trial_id = rep(trial_id, R),
@@ -42,19 +42,24 @@ trial <- function(res_dir) {
   
   # helper function for recording results
   record <- function(res, r, estimator, first_stage) {
-    Lasso.fit <- first_stage$Lasso.fit; 
-    beta0.hat <- first_stage$beta0.hat; 
-    lambda <- first_stage$lambda
-    S.hat <- which(beta0.hat[2:(pz+1)] != 0); S.hat_mod <- S.hat
-    s.hat <- length(S.hat); s.hat_mod <- s.hat
-    if ( s.hat_mod == 0 ) {
-      min_id <- map_dbl(1:length(Lasso.fit$lambda), 
-                      ~ Lasso.fit$beta[,.] %>% { which(. != 0) } %>% length) %>%
-        { which(. != 0) } %>% min 
-      
-      beta0.hat_mod <- c(Lasso.fit$a0[min_id], Lasso.fit$beta[,min_id] %>% as.numeric)
-      S.hat_mod <- which(beta0.hat_mod[2:(pz+1)] != 0)
-      s.hat_mod <- length(S.hat_mod)
+    if ( estimator %in% c("2SLS(ALL)", "FULL(ALL)", "Sup-Score") ) {
+      S.hat <- first_stage$S.hat; S.hat_mod <- S.hat
+      s.hat <- NA; s.hat_mod <- NA
+    } else {
+      Lasso.fit <- first_stage$Lasso.fit; 
+      beta0.hat <- first_stage$beta0.hat; 
+      lambda <- first_stage$lambda
+      S.hat <- which(beta0.hat[2:(pz+1)] != 0); S.hat_mod <- S.hat
+      s.hat <- length(S.hat); s.hat_mod <- s.hat
+      if ( s.hat_mod == 0 ) {
+        min_id <- map_dbl(1:length(Lasso.fit$lambda), 
+                          ~ Lasso.fit$beta[,.] %>% { which(. != 0) } %>% length) %>%
+                          { which(. != 0) } %>% min 
+        
+        beta0.hat_mod <- c(Lasso.fit$a0[min_id], Lasso.fit$beta[,min_id] %>% as.numeric)
+        S.hat_mod <- which(beta0.hat_mod[2:(pz+1)] != 0)
+        s.hat_mod <- length(S.hat_mod)
+      }
     }
     Z.S <- Z[, S.hat_mod]
     IV.fit <- fit.IV(y, x, Z.S)
@@ -69,27 +74,32 @@ trial <- function(res_dir) {
     assign('res', res, envir=environment(record))
   }
   
+  # 2SLS
+  if ( n == 100 ) { S.hat_2SLS <- sample(1:pz, 98, replace = FALSE) } else { S.hat_2SLS <- 1:pz }
+  record(res, r=1, estimator = "2SLS(ALL)", 
+         first_stage = list(S.hat = S.hat_2SLS))
+  
   # IV-Lasso
   sigma0_v.hat <- sigma0_v.hat_iter(x, Z)
   lambda_IL <- .lambda(sigma0.hat = sigma0_v.hat, Z = Z)
   Lasso.fit_IL <- glmnet(Z, x, intercept = TRUE)
   beta0.hat_IL <- predict(Lasso.fit_IL, type="coefficients", 
                           s=lambda_IL, exact=TRUE, x=Z, y=x) %>% as.numeric
-  record(res, r=1, estimator = "IV-Lasso", 
+  record(res, r=2, estimator = "IV-Lasso", 
          first_stage = list(Lasso.fit = Lasso.fit_IL, 
                             beta0.hat = beta0.hat_IL,
                             lambda = lambda_IL))
   
   # IV-Lasso-CV
-  Lasso.fit_CV <- cv.glmnet(Z, x, intercept = TRUE, lambda.min.ratio = 0.0001)
+  Lasso.fit_CV <- cv.glmnet(Z, x, intercept = TRUE, lambda.min.ratio = 0.00001)
   beta0.hat_CV <- predict(Lasso.fit_CV, type = "coefficients",
                           s = "lambda.min") %>% as.numeric
   lambda_CV <- Lasso.fit_CV$lambda.min
-  record(res, r=2, estimator="IV-Lasso-CV",
+  record(res, r=3, estimator="IV-Lasso-CV",
          first_stage = list(Lasso.fit = Lasso.fit_CV$glmnet.fit,
                             beta0.hat = beta0.hat_CV,
                             lambda = lambda_CV))
   res %>%
     write.csv(paste(res_dir, config_id, sprintf("res%d.csv", trial_id), sep = "/"))
-  # print
+    # print
 }

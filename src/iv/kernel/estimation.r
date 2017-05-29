@@ -46,8 +46,8 @@ beta0hat <- function(x, Z) {
 
 fit.IV <- function(y, x, Z) {
   n <- length(x)
-  X <- cbind(ones(n), x)
   Z <- cbind(ones(n), Z)
+  X <- cbind(ones(n), x)
   tZ <- t(Z)
   ZtZ <- tZ %*% Z
   tX <- t(X)
@@ -55,10 +55,13 @@ fit.IV <- function(y, x, Z) {
   num <- (tX %*% Z %*% solve(ZtZ, tZ %*% y)) 
   denom <- (tX %*% Z %*% solve(ZtZ, tZ %*% X))
   alpha0.hat <- solve(denom, num)
+  # print(alpha0.hat)
+  # theta0.hat <- (num/denom) %>% as.numeric
   theta0.hat <- alpha0.hat[2]
 
-  sigma0h.hat2 <- sum((y - X %*% alpha0.hat)^2) / (n-1)
+  sigma0h.hat2 <- sum((y - x * theta0.hat)^2) / (n-1)
   sigma0h.hat <- sqrt(sigma0h.hat2)
+  # SE_theta0.hat <- (sigma0h.hat2 / denom) %>% sqrt
   SE_alpha0.hat <- (sigma0h.hat2 * solve(denom)) %>% diag %>% sqrt
   SE_theta0.hat <- SE_alpha0.hat[2]
   
