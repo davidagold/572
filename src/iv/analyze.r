@@ -24,10 +24,13 @@ analyze <- function() {
   df_stats <- paste(res_dir, "stats.csv", sep = "/") %>% read.csv
   configs <- paste(src_dir, "config/configs.csv", sep = "/") %>% read.csv
   
+  level = .05
+  z_star <- qnorm(1-level/2, lower.tail = TRUE)
+  
   df_est %>%
     inner_join(configs, by = "config_id") %>%
     group_by(config_id) %>% 
-    summarize(rp_05 = test(estimate, theta0, SE)) %>%
+    summarize(rp_05 = ifelse(abs(estimate-truth)/SE > z_star, 1, 0)) %>%
     print
 }
 
