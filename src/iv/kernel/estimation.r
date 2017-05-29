@@ -49,22 +49,31 @@ tau.hat_iter <- function(obs, t = .05, c = 1.1, psi = .1, K = 100){
 
 fit.Fuller <- function(obs, S.op, C = 1, ...) {
   with(obs, {
-    print(S.op)
+    # print(S.op)
     # I follow the development in [Hansen, Hausman, Newey 08, Section 2]
     # of the Fuller and related IV estimators
-    O = cbind(y, x); Ot <- t(O)
+    O = cbind(y, X); Ot <- t(O)
     a.tilde <- solve(Ot %*% O, Ot %*% P(S.op, O)) %>%
       eigen %>% { .$values } %>% min
     a.hat <- ( a.tilde - (1 - a.tilde) * C/n ) / 
       ( 1 - (1 - a.tilde) * C/n )
+    print(a.tilde)
     
-    xtPx <- t(x) %*% P(S.op, x)
-    axtx <- a.hat * t(x) %*% x
-    xtPy <- t(x) %*% P(S.op, y)
-    axty <- a.hat * t(x) %*% y
+    # xtPx <- t(x) %*% P(S.op, x)
+    # axtx <- a.hat * t(x) %*% x
+    # xtPy <- t(x) %*% P(S.op, y)
+    # axty <- a.hat * t(x) %*% y
+    # theta.hat <- solve(xtPx - axtx, xtPy - axty) %>%
+    #   as.numeric
+    XtPX <- Xt %*% P(S.op, X)
+    aXtX <- a.hat * Xt %*% X
+    XtPy <- Xt %*% P(S.op, y)
+    aXty <- a.hat * Xt %*% y
     
-    theta.hat <- solve(xtPx - axtx, xtPy - axty) %>%
+    delta.hat <- solve(XtPX - aXtX, XtPy - aXty) %>%
       as.numeric
+    theta.hat <- delta.hat[2]
+    # print(delta.hat)
     
     # I follow the development in [Bekker 1994, p.666] of the
     # estimates of asymptotic covariance
@@ -72,12 +81,29 @@ fit.Fuller <- function(obs, S.op, C = 1, ...) {
     S.bar <- (Ot %*% P(S.op, O)) / dof
     S.perp <- Ot %*% (O - P(S.op, O)) / dof
     S <- S.bar + S.perp
-    S.bar.22 <- S.bar[2, 2]
+    S.bar.22 <- S.bar[2:3, 2:3]
     
-    sigma.hat <- t(c(1, -theta.hat)) %*% S %*% c(1, -theta.hat) %>% 
+    print(S.bar.22)
+    
+    sigma.hat2 <- t(c(1, -delta.hat)) %*% S %*% c(1, -delta.hat) %>%
       as.numeric
-    SE_theta.hat <- (sigma.hat * solve(S.bar.22)) %>%
-      diag %>% sqrt
+    sigma.hat <- sqrt(sigma.hat2)
+    # print(sigma.hat2)
+    
+    B <- S.bar - a.tilde * S.perp
+    B22 <- B[2:3, 2:3]
+    C <- S.bar - a.tilde *
+      (S.perp %*% (c(1, -delta.hat) %*% t(c(1, -delta.hat))) %*% S.perp ) /
+      as.numeric(t(c(1, -delta.hat)) %*% S.perp %*% c(1, -delta.hat))
+    C22 <- C[2:3, 2:3]
+    D <- a.tilde*(C-B)
+    D22 <- D[2:3, 2:3]
+    
+    Ahat <- sigma.hat2 * solve(B22, (C22 + D22) %*% solve(B22))
+    SE_delta.hat <- diag(Ahat) %>% sqrt
+    # print(SE_delta.hat)
+    
+    SE_theta.hat <- SE_delta.hat[2]
     
     list(theta.hat = theta.hat, sigma.hat = sigma.hat, 
          SE_theta.hat = SE_theta.hat, ...)
