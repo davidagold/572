@@ -16,55 +16,87 @@ suppressWarnings(library(glmnet))
     quantile(1 - t)
 }
 
-.lambda <- function(sigma0.hat, Z, t = 0.05, c = 1.1) {  2 * c * sigma0.hat * .Lambda.hat(Z, t = t) }
+.lambda <- function(sigma.hat, Z, t = 0.05, c = 1.1) {  2 * c * sigma.hat * .Lambda.hat(Z, t = t) }
 
-sigma0_v.hat_iter <- function(x, Z, t = .05, c = 1.1, psi = .1, K = 100){
-  n <- nrow(Z)
-  p <- ncol(Z)
-  # sigma0v.hat_k0 <- psi * sd(Y)
+lambda.IL <- function(obs) {
+  with(obs, {
+    tau.hat <- tau.hat_iter(x, Z)
+    lambda <- .lambda(sigma0.hat = tau.hat, Z = Z)
+  })
+  lambda
+}
+
+lambda.CV <- function(obs) "lambda.min"
+
+tau.hat_iter <- function(obs, t = .05, c = 1.1, psi = .1, K = 100){
+  y <- obs$y; x <- obs$x; Z <- obs$Z
   Lambda.hat <- .Lambda.hat(Z, t = t)
-  sigma0v.hat_k0 <- Inf
-  sigma0v.hat_k1 <- psi * sd(x)
+  tau.hat_k0 <- Inf
+  tau.hat_k1 <- psi * sd(x)
   nu <- .2 * sd(x)
-  # sigma0hats <- numeric(K)
   k <- 1
   fit <- glmnet(Z, x)
-  while ( abs(sigma0v.hat_k1 - sigma0v.hat_k0) > nu & k < K ) {
-    sigma0v.hat_k0 <- sigma0v.hat_k1
-    lambda <- 2 * c * sigma0v.hat_k1 * Lambda.hat
+  while ( abs(tau.hat_k1 - tau.hat_k0) > nu & k < K ) {
+    tau.hat_k0 <- tau.hat_k1
+    lambda <- 2 * c * tau.hat_k1 * Lambda.hat
     (predict(fit, Z, s = lambda/n, exact = TRUE, x = Z, y = x) - x)^2/n
     
-    sigma0v.hat_k1 <- sum((predict(fit, Z, s = lambda/n, exact = TRUE, x = Z, y = x) - x)^2/n) %>% sqrt
+    tau.hat_k1 <- sum((predict(fit, Z, s = lambda/n, exact = TRUE, x = Z, y = x) - x)^2/n) %>% sqrt
     k <- k + 1
   }
-  sigma0v.hat_k0
+  tau.hat_k0
 }
 
-beta0hat <- function(x, Z) {
-  # fit <- cv.glmnet(Z, x)
+fit.Fuller <- function(obs, S.op, C = 1, ...) {
+  with(obs, {
+    print(S.op)
+    # I follow the development in [Hansen, Hausman, Newey 08, Section 2]
+    # of the Fuller and related IV estimators
+    O = cbind(y, x); Ot <- t(O)
+    a.tilde <- solve(Ot %*% O, Ot %*% P(S.op, O)) %>%
+      eigen %>% { .$values } %>% min
+    a.hat <- ( a.tilde - (1 - a.tilde) * C/n ) / 
+      ( 1 - (1 - a.tilde) * C/n )
+    
+    xtPx <- t(x) %*% P(S.op, x)
+    axtx <- a.hat * t(x) %*% x
+    xtPy <- t(x) %*% P(S.op, y)
+    axty <- a.hat * t(x) %*% y
+    
+    theta.hat <- solve(xtPx - axtx, xtPy - axty) %>%
+      as.numeric
+    
+    # I follow the development in [Bekker 1994, p.666] of the
+    # estimates of asymptotic covariance
+    dof <- n - 1
+    S.bar <- (Ot %*% P(S.op, O)) / dof
+    S.perp <- Ot %*% (O - P(S.op, O)) / dof
+    S <- S.bar + S.perp
+    S.bar.22 <- S.bar[2, 2]
+    
+    sigma.hat <- t(c(1, -theta.hat)) %*% S %*% c(1, -theta.hat) %>% 
+      as.numeric
+    SE_theta.hat <- (sigma.hat * solve(S.bar.22)) %>%
+      diag %>% sqrt
+    
+    list(theta.hat = theta.hat, sigma.hat = sigma.hat, 
+         SE_theta.hat = SE_theta.hat, ...)
+  })
 }
 
-fit.IV <- function(y, x, Z) {
-  n <- length(x)
-  Z <- cbind(ones(n), Z)
-  X <- cbind(ones(n), x)
-  tZ <- t(Z)
-  ZtZ <- tZ %*% Z
-  tX <- t(X)
-  
-  num <- (tX %*% Z %*% solve(ZtZ, tZ %*% y)) 
-  denom <- (tX %*% Z %*% solve(ZtZ, tZ %*% X))
-  alpha0.hat <- solve(denom, num)
-  # print(alpha0.hat)
-  # theta0.hat <- (num/denom) %>% as.numeric
-  theta0.hat <- alpha0.hat[2]
-
-  sigma0h.hat2 <- sum((y - x * theta0.hat)^2) / (n-1)
-  sigma0h.hat <- sqrt(sigma0h.hat2)
-  # SE_theta0.hat <- (sigma0h.hat2 / denom) %>% sqrt
-  SE_alpha0.hat <- (sigma0h.hat2 * solve(denom)) %>% diag %>% sqrt
-  SE_theta0.hat <- SE_alpha0.hat[2]
-  
-  list(theta0.hat = theta0.hat, sigma0h.hat = sigma0h.hat, 
-       SE_theta0.hat = SE_theta0.hat)
+fit.IV <- function(obs, S.op, ...) {
+  with(obs, {
+    num <- Xt %*% P(S.op, y) 
+    denom <- Xt %*% P(S.op, X)
+    delta.hat <- solve(denom, num) %>%
+      as.numeric
+    # theta.hat <- (num/denom) %>% as.numeric
+    
+    sigma.hat2 <- sum((y - X %*% delta.hat)^2) / (n-1)
+    sigma.hat <- sqrt(sigma.hat2)
+    SE_delta.hat <- (sigma.hat2 * solve(denom)) %>% diag %>% sqrt
+    
+    list(theta.hat = delta.hat[2], sigma.hat = sigma.hat, 
+         SE_theta.hat = SE_delta.hat[2], ...)
+  })
 }

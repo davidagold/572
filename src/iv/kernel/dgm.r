@@ -39,9 +39,18 @@ obs. <- function(.config_id) {
   }
   sigma0_h <- 1; sigma0_hv <- .3
   
-  Z <- Z.(n, pz, Sigma_z)
+  .Z <- Z.(n, pz, Sigma_z)
   hv <- hv.(n, sigma0_h, sigma0_v, sigma0_hv)
-  yx <- yx.(Z, hv$h, hv$v, beta0, theta0)
-  list(y = yx$y, x = yx$x, Z = Z, n = n, pz = pz)
+  yx <- yx.(.Z, hv$h, hv$v, beta0, theta0)
+  y <- yx$y; x <- yx$x
+  X <- cbind(ones(n), yx$x); Xt <- t(X); XtX <- Xt %*% X
+  Z <- function(S) { cbind(ones(n), .Z)[,S] }
+  Zt <- function(S) { t(Z(S)) } 
+  ZtZ <- function(S) { Zt(S) %*% Z(S) } 
+  P <- function(S, b) { Z(S) %*% solve(ZtZ(S), Zt(S) %*% b) }
+  
+  obs <- list(n = n, pz = pz, y = y, x = x, X = X, Xt = Xt, 
+              XtX = XtX, Z = Z, Zt = Zt, ZtZ = ZtZ, P = P)
+  obs
 }
 
