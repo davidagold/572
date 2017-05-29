@@ -29,8 +29,9 @@ analyze <- function() {
   
   df_est %>%
     inner_join(configs, by = "config_id") %>%
+    mutate(rp05 = ifelse(abs(estimate-theta0)/SE > z_star, 1, 0)) %>%
     group_by(config_id) %>% 
-    summarize(rp_05 = ifelse(abs(estimate-truth)/SE > z_star, 1, 0)) %>%
+    summarize(avg_rp05 = mean(rp05)) %>%
     print
 }
 
