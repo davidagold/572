@@ -7,6 +7,8 @@ suppressWarnings(library(tidyr))
 suppressWarnings(library(purrr))
 source("dgm.r")
 source("estimation.r")
+# source("kernel/estimation.r")
+# source("kernel/dgm.r")
 
 #########################################################################
 # Simulation trial
@@ -15,81 +17,75 @@ trial <- function(res_dir) {
   # obtain config and trial ids and results directory
   args = commandArgs(trailingOnly=TRUE)
   config_id <- args[1] %>% as.numeric
-  res_dir <- args[2]
   trial_id <- Sys.getenv('SLURM_ARRAY_TASK_ID') %>% as.numeric
+  # config_id <- 1
+  # trial_id <- 1
+  res_dir <- args[2]
   
   # set up containers
-  R <- 1
-  .config_id <- rep(config_id, R)
-  .trial_id <- rep(trial_id, R)
-  .estimator <- numeric(R)
-  .estimate <- numeric(R)
-  .SE <- numeric(R)
-  .rmse <- numeric(R)
-  .shat_orig <- numeric(R)
-  .shat_mod <- numeric(R)
-  
+  R <- 2
+  res <- data.frame(
+    config_id = rep(config_id, R),
+    trial_id = rep(trial_id, R),
+    estimator = numeric(R),
+    estimate = numeric(R),
+    SE = numeric(R),
+    sigma0h.hat = numeric(R),
+    s.hat = numeric(R),
+    s.hat_mod = numeric(R)    
+  )
   # Generate data
   obs <- obs.(config_id)
   y <- obs$y; x <- obs$x; Z <- obs$Z
   n <- obs$n; pz <- obs$pz
   
-  # 2SLS, CV Lasso
-  fit_fs <- cv.glmnet(Z, x, intercept = FALSE)
-  beta0hat <- predict(fit_fs, type = "coefficients", s = "lambda.min")[2:(pz+1)] %>% as.numeric
-  Shat_orig_CV <- which(beta0hat != 0)
-  shat_orig_CV <- length(Shat_orig_CV)
-  
-  if ( shat_orig_CV == 0 ) {
-    noinsts_CV = TRUE
-    nz_lambda_ids <- map_int(1:length(fit_fs$lambda), ~ fit_fs$glmnet.fit$beta[,.] %>% 
-              as.numeric %>% { which(. != 0) } %>% length) %>%
-      { which(. != 0) }
-    min_nz_lambda_id <- min(nz_lambda_ids)
-    min_nz_lambda <- fit_fs$lambda[min_nz_lambda_id]
+  # helper function for recording results
+  record <- function(r, estimator, first_stage) {
+    Lasso.fit <- first_stage$Lasso.fit; 
+    beta0.hat <- first_stage$beta0.hat; 
+    lambda <- first_stage$lambda
+    S.hat <- which(beta0.hat != 0); S.hat_mod <- S.hat
+    s.hat <- length(S.hat); s.hat_mod <- s.hat
+    while ( s.hat_mod == 0 ) {
+      lambda <- lambda * .75
+      beta0.hat_mod <- predict(Lasso.fit, type="coefficients", s=lambda, 
+                               exact=T, x=Z, y=x)[2:(pz+1)] %>% as.numeric
+      # beta0hat_mod <- predict(fit_fs_CV, type = "coefficients", s = min_nz_lambda)[2:(pz+1)] %>% as.numeric
+      S.hat_mod <- which(beta0.hat_mod != 0)
+      s.hat_mod <- length(S.hat_mod)
+    }
+    Z.S <- Z[, S.hat_mod]
+    IV.fit <- fit.IV(y, x, Z.S)
     
-    # beta0hat_mod <- predict(fit_fs, type = "coefficients", s = min_nz_lambda)[2:(pz+1)] %>% as.numeric
-    beta0hat_mod <- fit_fs$glmnet.fit$beta[,min_nz_lambda_id] %>% as.numeric
-    Shat_mod_CV <- which(beta0hat_mod != 0)
-    shat_mod_CV <- length(Shat_mod_CV)
-    Z_ps_CV <- Z[, Shat_mod_CV]
-  } else {
-    shat_mod_CV <- NA
-    Z_ps_CV <- Z[, Shat_orig_CV]
+    res$estimator[r] <- estimator
+    res$estimate[r] <- IV.fit$theta0.hat
+    res$SE[r] <- IV.fit$SE_theta0.hat
+    res$sigma0h.hat[r] <- IV.fit$sigma0h.hat
+    res$s.hat[r] <- s.hat
+    res$s.hat_mod[r] <- s.hat_mod
   }
+
   
-  fit_tsls_CV <- theta0_tsls.(y, x, Z_ps_CV)
-  theta0_tsls_CV <- fit_tsls_CV$theta0_hat
-  sigma0_htsls_CV <- fit_tsls_CV$sigma0_hhat
-  SE_theta0_tsls_CV <- fit_tsls_CV$SE_theta0_hat
+  # IV-Lasso
+  sigma0_v.hat <- sigma0_v.hat_iter(x, Z)
+  lambda_IL <- .lambda(sigma0.hat = sigma0_v.hat, Z = Z)
+  Lasso.fit_IL <- glmnet(Z, x, intercept = FALSE)
+  beta0.hat_IL <- predict(Lasso.fit_IL, type="coefficients", 
+                          s=lambda_IL, exact=TRUE, x=Z, y=x)[2:(pz+1)] %>% as.numeric
+  record(r=1, estimator = "IV-Lasso", 
+         first_stage = list(Lasso.fit = Lasso.fit_IL, 
+                            beta0.hat = beta0.hat_IL,
+                            lambda = lambda_IL))
   
-  rmse_tsls_CV <- (y - x %*% theta0_tsls_CV)^2 %>% mean %>% sqrt
-  
-  r <- 1
-  .estimator[r] <- "IV-Lasso-CV"
-  .estimate[r] <- theta0_tsls_CV
-  .SE[r] <- SE_theta0_tsls_CV
-  .rmse[r] <- rmse_tsls_CV
-  .shat_orig[r] <- shat_orig_CV
-  .shat_mod[r] <- shat_mod_CV
-  
-  df_est <- data.frame(
-    config_id = .config_id,
-    trial_id = .trial_id,
-    estimator = .estimator,
-    estimate = .estimate,
-    SE = .SE
-  )
-  df_stats <- data.frame(
-    config_id = .config_id,
-    trial_id = .trial_id,
-    estimator = .estimator,
-    rmse = .rmse,
-    shat_orig = .shat_orig,
-    shat_mod = .shat_mod
-  )
-  
-  # list(df_est = df_est, df_stats = df_stats)
-  write.csv(df_est, paste(res_dir, "/", config_id, "/est/est", trial_id, ".csv", sep=""))
-  write.csv(df_stats, paste(res_dir, "/", config_id, "/stats/stats", trial_id, ".csv", sep=""))
+  # IV-Lasso-CV
+  Lasso.fit_CV <- cv.glmnet(Z, x, intercept = FALSE)
+  beta0.hat_CV <- predict(Lasso.fit_CV, type = "coefficients",
+                          s = "lambda.min")[2:(pz+1)] %>% as.numeric
+  lambda_CV <- Lasso.fit_CV$lambda.min
+  record(r=2, estimator="IV-Lasso-CV",
+         first_stage = list(Lasso.fit = Lasso.fit_CV,
+                            beta0.hat = beta0.hat_CV,
+                            lambda = lambda_CV))
+  res %>%
+    write.csv(paste(res_dir, config_id, sprintf("res%d.csv", trial_id), sep = "/"))
 }
