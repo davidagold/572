@@ -1,12 +1,13 @@
 # setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 #########################################################################
 # Dependencies
-
 suppressWarnings(library(dplyr))
 suppressWarnings(library(tidyr))
 suppressWarnings(library(purrr))
+source("utils.r")
 source("dgm.r")
 source("estimation.r")
+# source("kernel/utils.r")
 # source("kernel/estimation.r")
 # source("kernel/dgm.r")
 
@@ -44,13 +45,15 @@ trial <- function(res_dir) {
     Lasso.fit <- first_stage$Lasso.fit; 
     beta0.hat <- first_stage$beta0.hat; 
     lambda <- first_stage$lambda
-    S.hat <- which(beta0.hat != 0); S.hat_mod <- S.hat
+    S.hat <- which(beta0.hat[2:(pz+1)] != 0); S.hat_mod <- S.hat
     s.hat <- length(S.hat); s.hat_mod <- s.hat
-    while ( s.hat_mod == 0 ) {
-      lambda <- lambda * .75
-      beta0.hat_mod <- predict(Lasso.fit, type="coefficients", s=lambda, 
-                               exact=T, x=Z, y=x)[2:(pz+1)] %>% as.numeric
-      S.hat_mod <- which(beta0.hat_mod != 0)
+    if ( s.hat_mod == 0 ) {
+      min_id <- map_dbl(1:length(Lasso.fit$lambda), 
+                      ~ Lasso.fit$beta[,.] %>% { which(. != 0) } %>% length) %>%
+        { which(. != 0) } %>% min 
+      
+      beta0.hat_mod <- c(Lasso.fit$a0[min_id], Lasso.fit$beta[,min_id] %>% as.numeric)
+      S.hat_mod <- which(beta0.hat_mod[2:(pz+1)] != 0)
       s.hat_mod <- length(S.hat_mod)
     }
     Z.S <- Z[, S.hat_mod]
@@ -69,23 +72,24 @@ trial <- function(res_dir) {
   # IV-Lasso
   sigma0_v.hat <- sigma0_v.hat_iter(x, Z)
   lambda_IL <- .lambda(sigma0.hat = sigma0_v.hat, Z = Z)
-  Lasso.fit_IL <- glmnet(Z, x, intercept = FALSE)
+  Lasso.fit_IL <- glmnet(Z, x, intercept = TRUE)
   beta0.hat_IL <- predict(Lasso.fit_IL, type="coefficients", 
-                          s=lambda_IL, exact=TRUE, x=Z, y=x)[2:(pz+1)] %>% as.numeric
+                          s=lambda_IL, exact=TRUE, x=Z, y=x) %>% as.numeric
   record(res, r=1, estimator = "IV-Lasso", 
          first_stage = list(Lasso.fit = Lasso.fit_IL, 
                             beta0.hat = beta0.hat_IL,
                             lambda = lambda_IL))
   
   # IV-Lasso-CV
-  Lasso.fit_CV <- cv.glmnet(Z, x, intercept = FALSE)
+  Lasso.fit_CV <- cv.glmnet(Z, x, intercept = TRUE, lambda.min.ratio = 0.0001)
   beta0.hat_CV <- predict(Lasso.fit_CV, type = "coefficients",
-                          s = "lambda.min")[2:(pz+1)] %>% as.numeric
+                          s = "lambda.min") %>% as.numeric
   lambda_CV <- Lasso.fit_CV$lambda.min
   record(res, r=2, estimator="IV-Lasso-CV",
-         first_stage = list(Lasso.fit = Lasso.fit_CV,
+         first_stage = list(Lasso.fit = Lasso.fit_CV$glmnet.fit,
                             beta0.hat = beta0.hat_CV,
                             lambda = lambda_CV))
   res %>%
     write.csv(paste(res_dir, config_id, sprintf("res%d.csv", trial_id), sep = "/"))
+  # print
 }

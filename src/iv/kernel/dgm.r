@@ -1,17 +1,10 @@
 # setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 #########################################################################
 # Dependencies
-
-suppressWarnings(library(dplyr))
-suppressWarnings(library(tidyr))
-suppressWarnings(library(purrr))
 suppressWarnings(library(mvtnorm))
 
 #########################################################################
 # Data-generating mechanism
-
-zeros <- function(p) rep(0, p)
-ones <- function(p) rep(1, p)
 
 Z. <- function(n, pz, Sigma_z) {
   Z <- rmvnorm(n, zeros(pz), Sigma_z)

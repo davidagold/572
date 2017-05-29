@@ -1,10 +1,6 @@
 # setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 #########################################################################
 # Dependencies
-
-suppressWarnings(library(dplyr))
-suppressWarnings(library(tidyr))
-suppressWarnings(library(purrr))
 suppressWarnings(library(glmnet))
 
 #########################################################################
@@ -49,17 +45,22 @@ beta0hat <- function(x, Z) {
 }
 
 fit.IV <- function(y, x, Z) {
-  n <- length(y)
+  n <- length(x)
+  X <- cbind(ones(n), x)
+  Z <- cbind(ones(n), Z)
   tZ <- t(Z)
   ZtZ <- tZ %*% Z
-  tx <- t(x)
+  tX <- t(X)
   
-  num <- (tx %*% Z %*% solve(ZtZ, tZ %*% y)) %>% as.numeric
-  denom <- (tx %*% Z %*% solve(ZtZ, tZ %*% x)) %>% as.numeric
-  theta0.hat <- num / denom
+  num <- (tX %*% Z %*% solve(ZtZ, tZ %*% y)) 
+  denom <- (tX %*% Z %*% solve(ZtZ, tZ %*% X))
+  alpha0.hat <- solve(denom, num)
+  theta0.hat <- alpha0.hat[2]
 
-  sigma0h.hat <- (sum((y - x %*% theta0.hat)^2)/(n-1)) %>% sqrt
-  SE_theta0.hat <- (sigma0h.hat / sqrt(denom))
+  sigma0h.hat2 <- sum((y - X %*% alpha0.hat)^2) / (n-1)
+  sigma0h.hat <- sqrt(sigma0h.hat2)
+  SE_alpha0.hat <- (sigma0h.hat2 * solve(denom)) %>% diag %>% sqrt
+  SE_theta0.hat <- SE_alpha0.hat[2]
   
   list(theta0.hat = theta0.hat, sigma0h.hat = sigma0h.hat, 
        SE_theta0.hat = SE_theta0.hat)
