@@ -40,7 +40,7 @@ trial <- function(res_dir) {
   n <- obs$n; pz <- obs$pz
   
   # helper function for recording results
-  record <- function(r, estimator, first_stage) {
+  record <- function(res, r, estimator, first_stage) {
     Lasso.fit <- first_stage$Lasso.fit; 
     beta0.hat <- first_stage$beta0.hat; 
     lambda <- first_stage$lambda
@@ -50,7 +50,6 @@ trial <- function(res_dir) {
       lambda <- lambda * .75
       beta0.hat_mod <- predict(Lasso.fit, type="coefficients", s=lambda, 
                                exact=T, x=Z, y=x)[2:(pz+1)] %>% as.numeric
-      # beta0hat_mod <- predict(fit_fs_CV, type = "coefficients", s = min_nz_lambda)[2:(pz+1)] %>% as.numeric
       S.hat_mod <- which(beta0.hat_mod != 0)
       s.hat_mod <- length(S.hat_mod)
     }
@@ -63,8 +62,9 @@ trial <- function(res_dir) {
     res$sigma0h.hat[r] <- IV.fit$sigma0h.hat
     res$s.hat[r] <- s.hat
     res$s.hat_mod[r] <- s.hat_mod
+    
+    assign('res', res, envir=environment(record))
   }
-
   
   # IV-Lasso
   sigma0_v.hat <- sigma0_v.hat_iter(x, Z)
@@ -72,7 +72,7 @@ trial <- function(res_dir) {
   Lasso.fit_IL <- glmnet(Z, x, intercept = FALSE)
   beta0.hat_IL <- predict(Lasso.fit_IL, type="coefficients", 
                           s=lambda_IL, exact=TRUE, x=Z, y=x)[2:(pz+1)] %>% as.numeric
-  record(r=1, estimator = "IV-Lasso", 
+  record(res, r=1, estimator = "IV-Lasso", 
          first_stage = list(Lasso.fit = Lasso.fit_IL, 
                             beta0.hat = beta0.hat_IL,
                             lambda = lambda_IL))
@@ -82,7 +82,7 @@ trial <- function(res_dir) {
   beta0.hat_CV <- predict(Lasso.fit_CV, type = "coefficients",
                           s = "lambda.min")[2:(pz+1)] %>% as.numeric
   lambda_CV <- Lasso.fit_CV$lambda.min
-  record(r=2, estimator="IV-Lasso-CV",
+  record(res, r=2, estimator="IV-Lasso-CV",
          first_stage = list(Lasso.fit = Lasso.fit_CV,
                             beta0.hat = beta0.hat_CV,
                             lambda = lambda_CV))
