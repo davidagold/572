@@ -15,6 +15,7 @@ beta0hat <- function(x, Z) {
 }
 
 theta0_tsls. <- function(y, x, Z) {
+  n <- length(y)
   tZ <- t(Z)
   ZtZ <- tZ %*% Z
   tx <- t(x)
@@ -26,9 +27,9 @@ theta0_tsls. <- function(y, x, Z) {
   denom <- (tx %*% Z %*% solve(ZtZ, tZ %*% x)) %>% as.numeric
   theta0_hat <- num / denom
 
-  sigma0_hhat <- sd(y - x %*% theta0_hat)
-  var_theta0_hat <- sigma0_hhat^2 / denom
+  sigma0_hhat <- ((y - x %*% theta0_hat)^2/(n-1)) %>% sqrt
+  SE_theta0_hat <- (sigma0_hhat / sqrt(denom)) / sqrt(n)
   
   list(theta0_hat = theta0_hat, sigma0_hhat = sigma0_hhat, 
-       var_theta0_hat = var_theta0_hat)
+       SE_theta0_hat = SE_theta0_hat)
 }

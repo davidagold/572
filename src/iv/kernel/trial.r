@@ -61,15 +61,14 @@ trial <- function(res_dir) {
   fit_tsls_CV <- theta0_tsls.(y, x, Z_ps_CV)
   theta0_tsls_CV <- fit_tsls_CV$theta0_hat
   sigma0_htsls_CV <- fit_tsls_CV$sigma0_hhat
-  var_theta0_tsls_CV <- fit_tsls_CV$var_theta0_hat
+  SE_theta0_tsls_CV <- fit_tsls_CV$SE_theta0_hat
   
-  SE_tsls_CV <- (var_theta0_tsls_CV * n) %>% sqrt
   rmse_tsls_CV <- (y - x %*% theta0_tsls_CV)^2 %>% mean %>% sqrt
   
   r <- 1
   .estimator[r] <- "IV-Lasso-CV"
   .estimate[r] <- theta0_tsls_CV
-  .SE[r] <- SE_tsls_CV
+  .SE[r] <- SE_theta0_tsls_CV
   .rmse[r] <- rmse_tsls_CV
   .shat_orig[r] <- shat_orig_CV
   .shat_mod[r] <- shat_mod_CV
