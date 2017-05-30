@@ -22,12 +22,12 @@ trial <- function(res_dir) {
   args = commandArgs(trailingOnly=TRUE)
   config_id <- args[1] %>% as.numeric
   trial_id <- Sys.getenv('SLURM_ARRAY_TASK_ID') %>% as.numeric
-  config_id <- 1
+  # config_id <- 1
   # config_id <- 4
   # trial_id <- 1
-  # src_dir <- args[2]
-  # res_dir <- args[3]
-  src_dir <- "/Users/David/Documents/UW/2016-7/spring/572/src/iv"
+  # src_dir <- "/Users/David/Documents/UW/2016-7/spring/572/src/iv"
+  src_dir <- args[2]
+  res_dir <- args[3]
   source(paste(src_dir, "kernel/utils.r", sep="/"))
   source(paste(src_dir, "kernel/dgm.r", sep="/"))
   source(paste(src_dir, "kernel/estimation.r", sep="/"))
