@@ -10,19 +10,18 @@ suppressWarnings(library(glmnet))
   n <- nrow(Z)
   g <- rnorm(n * m, 0, 1)
   map(1:m, ~ (Z * rnorm(n, 0, 1)) %>% 
-        apply(2, sum) %>% 
+        apply(2, function(x) { sum(x) %>% abs }) %>% 
         max) %>%
     as.numeric %>%
     quantile(1 - t)
 }
 
 .Lambda.hat2 <- function(n, Z, level = .05, m = 500){
-  n <- nrow(Z)
-  g <- 
-  map(1:m, ~ Z * rnorm(n, 0, 1)) %>% 
-    map_dbl(~ { apply(., 2, sum)/apply(., 2, function(x) sqrt(mean(x^2))) } %>%
-          max) %>%
-    quantile(1-level)
+  map_dbl(1:m, ~ (Z * rnorm(n, 0, 1)) %>%
+        apply(2, function(x) { abs(sum(x))/sqrt(mean(x^2)) }) %>%
+        max) %>%
+    as.numeric %>%
+    quantile(1 - level)
 }
 
 .lambda <- function(sigma.hat, Z, t = 0.05, c = 1.1) {  2 * c * sigma.hat * .Lambda.hat(Z, t = t) }

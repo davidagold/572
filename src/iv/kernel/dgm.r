@@ -47,7 +47,7 @@ obs. <- function(.config_id) {
   Z <- function(S) { cbind(ones(n), .Z)[,S] }
   Zt <- function(S) { t(Z(S)) } 
   ZtZ <- function(S) { Zt(S) %*% Z(S) } 
-  P <- function(S, b) { Z(S) %*% solve(ZtZ(S), Zt(S) %*% b) }
+  P <- function(S=(1:(pz+1)), b) { Z(S) %*% solve(ZtZ(S), Zt(S) %*% b) }
   
   obs <- list(n = n, pz = pz, y = y, x = x, X = X, Xt = Xt, 
               XtX = XtX, Z = Z, Zt = Zt, ZtZ = ZtZ, P = P)
