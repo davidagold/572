@@ -20,7 +20,7 @@ trial <- function(res_dir) {
   args = commandArgs(trailingOnly=TRUE)
   config_id <- args[1] %>% as.numeric
   trial_id <- Sys.getenv('SLURM_ARRAY_TASK_ID') %>% as.numeric
-  # config_id <- 1
+  # config_id <- 4
   # trial_id <- 1
   res_dir <- args[2]
   

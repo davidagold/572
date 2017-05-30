@@ -52,58 +52,79 @@ fit.Fuller <- function(obs, S.op, C = 1, ...) {
     # print(S.op)
     # I follow the development in [Hansen, Hausman, Newey 08, Section 2]
     # of the Fuller and related IV estimators
+    print(C)
     O = cbind(y, X); Ot <- t(O)
     a.tilde <- solve(Ot %*% O, Ot %*% P(S.op, O)) %>%
       eigen %>% { .$values } %>% min
     a.hat <- ( a.tilde - (1 - a.tilde) * C/n ) / 
       ( 1 - (1 - a.tilde) * C/n )
-    print(a.tilde)
     
     # xtPx <- t(x) %*% P(S.op, x)
     # axtx <- a.hat * t(x) %*% x
     # xtPy <- t(x) %*% P(S.op, y)
     # axty <- a.hat * t(x) %*% y
     # theta.hat <- solve(xtPx - axtx, xtPy - axty) %>%
-    #   as.numeric
+      # as.numeric
+    # delta.hat <- theta.hat
     XtPX <- Xt %*% P(S.op, X)
     aXtX <- a.hat * Xt %*% X
     XtPy <- Xt %*% P(S.op, y)
     aXty <- a.hat * Xt %*% y
-    
+
     delta.hat <- solve(XtPX - aXtX, XtPy - aXty) %>%
       as.numeric
     theta.hat <- delta.hat[2]
-    # print(delta.hat)
+    print(delta.hat)
+    
+    u.hat <- y - X %*% delta.hat
+    sigma.hat2 <- as.numeric(t(u.hat) %*% u.hat) / (n-ncol(X))
+    alpha.tilde <- as.numeric(t(u.hat) %*% P(S.op, u.hat)) / as.numeric(t(u.hat) %*% u.hat)
+    X.tilde <- X - u.hat %*% (t(u.hat) %*% X) / as.numeric(t(u.hat) %*% u.hat)
+    
+    H.hat <- Xt %*% P(S.op, X) - alpha.tilde * Xt %*% X
+    Sigma.hat <- sigma.hat2 * (1 - alpha.tilde)^2 * t(X.tilde) %*% P(S.op, X.tilde) +
+      alpha.tilde^2 * t(X.tilde) %*% (X.tilde - P(S.op, X.tilde))
+    
+    Var <- solve(H.hat, Sigma.hat %*% solve(H.hat))
+    SE_delta.hat <- Var %>% diag %>% sqrt
+    SE_theta.hat <- SE_delta.hat[2]
+    sigma.hat <- sqrt(sigma.hat2)
+    
+    
+    
     
     # I follow the development in [Bekker 1994, p.666] of the
     # estimates of asymptotic covariance
-    dof <- n - 1
-    S.bar <- (Ot %*% P(S.op, O)) / dof
-    S.perp <- Ot %*% (O - P(S.op, O)) / dof
-    S <- S.bar + S.perp
-    S.bar.22 <- S.bar[2:3, 2:3]
-    
-    print(S.bar.22)
-    
-    sigma.hat2 <- t(c(1, -delta.hat)) %*% S %*% c(1, -delta.hat) %>%
-      as.numeric
-    sigma.hat <- sqrt(sigma.hat2)
-    # print(sigma.hat2)
-    
-    B <- S.bar - a.tilde * S.perp
-    B22 <- B[2:3, 2:3]
-    C <- S.bar - a.tilde *
-      (S.perp %*% (c(1, -delta.hat) %*% t(c(1, -delta.hat))) %*% S.perp ) /
-      as.numeric(t(c(1, -delta.hat)) %*% S.perp %*% c(1, -delta.hat))
-    C22 <- C[2:3, 2:3]
-    D <- a.tilde*(C-B)
-    D22 <- D[2:3, 2:3]
-    
-    Ahat <- sigma.hat2 * solve(B22, (C22 + D22) %*% solve(B22))
-    SE_delta.hat <- diag(Ahat) %>% sqrt
-    # print(SE_delta.hat)
-    
-    SE_theta.hat <- SE_delta.hat[2]
+    # dof <- n - 1
+    # S.bar <- (Ot %*% P(S.op, O)) / dof
+    # S.perp <- Ot %*% (O - P(S.op, O)) / dof
+    # S <- S.bar + S.perp
+    # S.bar.22 <- S.bar[2:3, 2:3]
+    # # S.bar.22 <- S.bar[2, 2]
+    # 
+    # sigma.hat2 <- t(c(1, -delta.hat)) %*% S %*% c(1, -delta.hat) %>%
+    #   as.numeric
+    # sigma.hat <- sqrt(sigma.hat2)
+    # # print(sigma.hat2)
+    # 
+    # B <- S.bar - a.hat * S.perp
+    # B22 <- B[2:3, 2:3]
+    # # B22 <- B[2, 2]
+    # C <- S.bar - a.hat *
+    #   (S.perp %*% (c(1, -delta.hat) %*% t(c(1, -delta.hat))) %*% S.perp ) /
+    #   as.numeric(t(c(1, -delta.hat)) %*% S.perp %*% c(1, -delta.hat))
+    # # C22 <- C[2:3, 2:3]
+    # C22 <- C[2, 2]
+    # D <- a.hat*(C-B)
+    # D22 <- D[2:3, 2:3]
+    # # D22 <- D[2, 2]
+    # 
+    # Ahat <- sigma.hat2 * solve(B22, (C22 + D22) %*% solve(B22))
+    # # Ahat <- sigma.hat2 * (C22 + D22) / (B22^2)
+    # SE_delta.hat <- diag(Ahat) %>% sqrt
+    # SE_theta.hat <- SE_delta.hat[2]
+    # # SE_theta.hat <- sqrt(Ahat)
+    # # print(SE_delta.hat)
     
     list(theta.hat = theta.hat, sigma.hat = sigma.hat, 
          SE_theta.hat = SE_theta.hat, ...)
