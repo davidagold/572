@@ -25,12 +25,12 @@ trial <- function(res_dir) {
   res_dir <- args[2]
   
   # set up containers
-  R <- 6
+  R <- 7
   res <- data.frame(
     config_id = rep(config_id, R),
     trial_id = rep(trial_id, R),
     estimator = numeric(R),
-    theta.hat = numeric(R),
+    statistic = numeric(R),
     SE_theta.hat = numeric(R),
     sigma.hat = numeric(R),
     s.hat = numeric(R),
@@ -61,6 +61,7 @@ trial <- function(res_dir) {
         beta.hat_mod <- betas(fit.beta)[,id.mod] %>% as.numeric
         S.op <- which(beta.hat_mod != 0)
         s.op <- length(S.op)
+        fit.delta <- .fit.delta(obs, S.op, ...)
       }
     } else if ( !is.null(S.op) ) {
       s.hat <- NA; s.op <- length(S.op)
@@ -68,11 +69,20 @@ trial <- function(res_dir) {
     fit.delta <- .fit.delta(obs, S.op, ...)
     
     res$estimator[r] <- fit.delta$estimator
-    res$theta.hat[r] <- fit.delta$theta.hat
+    res$statistic[r] <- fit.delta$theta.hat
     res$SE_theta.hat[r] <- fit.delta$SE_theta.hat
     res$sigma.hat[r] <- fit.delta$sigma.hat
     res$s.hat[r] <- s.hat
     res$s.op[r] <- s.op
+    assign('res', res, envir=environment(record))
+  }
+  record_sup.score <- function(res, r, obs, level = .05) {
+    res$estimator[r] <- "Sup-Score"
+    res$statistic[r] <- test.sup.score(obs, a = 1, level = level)
+    res$SE_theta.hat[r] <- NA
+    res$sigma.hat[r] <- NA
+    res$s.hat[r] <- NA
+    res$s.op[r] <- NA
     assign('res', res, envir=environment(record))
   }
   
@@ -101,6 +111,9 @@ trial <- function(res_dir) {
   # Fuller(Lasso-CV)
   record(res, r<-r+1, obs, .fit.beta = list(fit. = cv.glmnet, lambda. = lambda.CV),
          .fit.delta = fit.Fuller, estimator = "Fuller(Lasso-CV)")
+  
+  # Sup-Score
+  record_sup.score(res, r<-r+1, obs)
  
   res %>%
     write.csv(paste(res_dir, config_id, sprintf("res%d.csv", trial_id), sep = "/"))

@@ -16,6 +16,15 @@ suppressWarnings(library(glmnet))
     quantile(1 - t)
 }
 
+.Lambda.hat2 <- function(n, Z, level = .05, m = 500){
+  n <- nrow(Z)
+  g <- 
+  map(1:m, ~ Z * rnorm(n, 0, 1)) %>% 
+    map_dbl(~ { apply(., 2, sum)/apply(., 2, function(x) sqrt(mean(x^2))) } %>%
+          max) %>%
+    quantile(1-level)
+}
+
 .lambda <- function(sigma.hat, Z, t = 0.05, c = 1.1) {  2 * c * sigma.hat * .Lambda.hat(Z, t = t) }
 
 lambda.IL <- function(obs) {
@@ -47,12 +56,21 @@ tau.hat_iter <- function(obs, t = .05, c = 1.1, psi = .1, K = 100){
   tau.hat_k0
 }
 
+test.sup.score <- function(obs, a, level) {
+  with(obs, {
+    .Z <- scale(Z(2:(pz+1)))
+    sup.score <- map_dbl(1:pz, ~ abs(sum((y - x*a) * .Z[,.])) / 
+                           sqrt(mean((y - x*a)^2 * .Z[,.]^2))) %>% max
+    q.star <- .Lambda.hat2(n, .Z, level = .05)
+    ifelse(sup.score > q.star, 1, 0)
+  })
+}
+
 fit.Fuller <- function(obs, S.op, C = 1, ...) {
   with(obs, {
     # print(S.op)
     # I follow the development in [Hansen, Hausman, Newey 08, Section 2]
     # of the Fuller and related IV estimators
-    print(C)
     O = cbind(y, X); Ot <- t(O)
     a.tilde <- solve(Ot %*% O, Ot %*% P(S.op, O)) %>%
       eigen %>% { .$values } %>% min
@@ -74,7 +92,7 @@ fit.Fuller <- function(obs, S.op, C = 1, ...) {
     delta.hat <- solve(XtPX - aXtX, XtPy - aXty) %>%
       as.numeric
     theta.hat <- delta.hat[2]
-    print(delta.hat)
+    # print(delta.hat)
     
     u.hat <- y - X %*% delta.hat
     sigma.hat2 <- as.numeric(t(u.hat) %*% u.hat) / (n-ncol(X))
@@ -89,8 +107,6 @@ fit.Fuller <- function(obs, S.op, C = 1, ...) {
     SE_delta.hat <- Var %>% diag %>% sqrt
     SE_theta.hat <- SE_delta.hat[2]
     sigma.hat <- sqrt(sigma.hat2)
-    
-    
     
     
     # I follow the development in [Bekker 1994, p.666] of the
