@@ -12,8 +12,8 @@ Z. <- function(n, pz, Sigma_z) {
 }
 
 hv. <- function(n, sigma0_h, sigma0_v, sigma0_hv) {
-  Sigma0_hv <- matrix(c(sigma0_h^2, sigma0_hv,
-                        sigma0_hv, sigma0_v^2), nrow=2)
+  Sigma0_hv <- matrix(c(sigma0_h^2, sigma0_hv*sigma0_h*sigma0_v,
+                        sigma0_hv*sigma0_h*sigma0_v, sigma0_v^2), nrow=2)
   hv <- rmvnorm(n, zeros(2), Sigma0_hv)
   list(h = hv[,1], v = hv[,2])
 }
