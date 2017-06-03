@@ -11,4 +11,4 @@
 #SBATCH --array=1-100
 
 config_id=$1; res_dir=$2
-Rscript iv.r $config_id $res_dir
+Rscript iv.r $config_id /homes/dag89/572/src/ $res_dir
