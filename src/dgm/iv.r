@@ -44,7 +44,7 @@ obs. <- function(.config_id) {
   yx <- yx.(Z, hv$h, hv$v, beta0, theta0)
   y <- as.vector(yx$y); x <- as.vector(yx$x)
   
-  obs <- list(n = n, pz = pz, y = y, x = x, X = X, Z = Z)
+  obs <- list(n = n, pz = pz, y = y, x = x, Z = Z)
   obs
 }
 

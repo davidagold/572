@@ -16,7 +16,7 @@ tau.hat_iter <- function(x, Z, t = .05, c = 1.1, psi = .1, K = 100){
     tau.hat_k0 <- tau.hat_k1
     lambda <- 2 * c * tau.hat_k1 * Lambda.hat / n
     fit <- lasso(x, Z, lambda = lambda)
-    tau.hat_k1 <- (sum((x - fit$beta0.hat - Z %*% fit$beta.hat)^2)/n) %>% sqrt
+    tau.hat_k1 <- (sum((x - fit$beta0.hat - Z %*% fit$beta)^2)/n) %>% sqrt
     print(tau.hat_k1)
     k <- k + 1
   }
@@ -33,4 +33,6 @@ Lambda.hat_ <- function(Z, t = .05, m = 500){
     quantile(1 - t)
 }
 
-lambda_ <- function(x, Z, c = 1.1) {  2*c * tau.hat_iter(x, Z) * Lambda.hat_(Z) / nrow(Z) }
+lambda_ <- function(x, Z, c = 1.1, m = 500) {  
+  2*c * tau.hat_iter(x, Z) * Lambda.hat_(Z, m = m) / nrow(Z) 
+}

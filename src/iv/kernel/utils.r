@@ -4,6 +4,7 @@
 suppressWarnings(library(dplyr))
 suppressWarnings(library(tidyr))
 suppressWarnings(library(purrr))
+suppressWarnings(library(methods))
 
 #########################################################################
 # Utility functions

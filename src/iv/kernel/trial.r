@@ -22,7 +22,9 @@ trial <- function(res_dir) {
   trial_id <- Sys.getenv('SLURM_ARRAY_TASK_ID') %>% as.numeric
   # config_id <- 4
   # trial_id <- 1
-  res_dir <- args[2]
+  src_dir <- args[2]
+  res_dir <- args[3]
+  
   
   # set up containers
   R <- 7
