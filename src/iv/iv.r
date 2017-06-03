@@ -10,7 +10,7 @@ run <- function(){
   src_dir <- args[2]
   res_dir <- args[3]
   # trial_id <- 1
-  # config_id <- 1
+  # config_id <- 4
   # src_dir <- "/Users/David/Documents/UW/2016-7/spring/572/src"
   # res_dir <- "/Users/David/Documents/UW/2016-7/spring/572/res"
   source(paste(src_dir, "utils.r", sep="/"), chdir=T)

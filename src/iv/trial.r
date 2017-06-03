@@ -70,10 +70,15 @@ trial <- function(config_id, trial_id, res_dir) {
   if ( n == 100 ) { S.op_FL <- sample(1:pz, 98, replace = FALSE) } else { S.op_FL <- 1:pz }
   record(res, r<-r+1, obs, S.op = S.op_FL, est.delta = fuller, estimator = "Fuller(All)")
 
-  lambda <- lambda_(x = obs$x, Z = obs$Z)
-  fit.beta.IL <- lasso(y = obs$x, X = obs$Z, lambda = lambda)
+  lambdas <- lambda_(x = obs$x, Z = obs$Z)
+  sprintf("lambda.dat = %2.6f", lambdas$lambda.dat) %>% print
+  sprintf("lambda.thr = %2.6f", lambdas$lambda.thr) %>% print
+  fit.beta.IL <- lasso(y = obs$x, X = obs$Z, lambda = lambdas$lambda.thr)
+  sprintf("lambda.max (IR) = %2.6f", fit.beta.IL$lambdas[1]) %>% print
+  sprintf("lambda.min (IR) = %2.6f", fit.beta.IL$lambdas[length(fit.beta.IL$lambdas)]) %>% print
   fit.beta.CV <- cv.lasso(y = obs$x, X = obs$Z, epsilon = .1)
-  fit.beta.CV
+  sprintf("lambda.max (CV) = %2.6f", fit.beta.CV$lambdas[1]) %>% print
+  sprintf("lambda.min (CV) = %2.6f", fit.beta.CV$lambdas[length(fit.beta.IL$lambdas)]) %>% print
   # list(x = obs$x, y = obs$y, Z = obs$Z)
 
   # IV(Lasso-IL)

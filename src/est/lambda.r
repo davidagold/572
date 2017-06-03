@@ -6,15 +6,17 @@
 # lambda specification
 
 tau.hat_iter <- function(x, Z, t = .05, c = 1.1, psi = .1, K = 100){
-  n <- nrow(Z)
-  Lambda.hat <- Lambda.hat_(Z, t = t)
+  n <- nrow(Z); pz <- ncol(Z)
+  # Lambda.hat <- Lambda.hat_(Z, t = t)
   tau.hat_k0 <- Inf
-  tau.hat_k1 <- psi * sd(x)
+  id.maxcor <- map_dbl(1:pz, ~cor(x, Z[,.])) %>% which.max
+  tau.hat_k1 <- psi * mean((x - predict(lm(x ~ Z[,id.maxcor])))^2)
   nu <- .2 * sd(x)
   k <- 1
   while ( abs(tau.hat_k1 - tau.hat_k0) > nu & k < K ) {
     tau.hat_k0 <- tau.hat_k1
-    lambda <- 2 * c * tau.hat_k1 * Lambda.hat / n
+    # lambda <- 2 * c * tau.hat_k1 * Lambda.hat / n
+    lambda <- 2*c * tau.hat_k1 * sqrt(2*log(2*pz)/n)
     fit <- lasso(x, Z, lambda = lambda)
     tau.hat_k1 <- (sum((x - fit$beta0.hat - Z %*% fit$beta)^2)/n) %>% sqrt
     print(tau.hat_k1)
@@ -33,6 +35,10 @@ Lambda.hat_ <- function(Z, t = .05, m = 500){
     quantile(1 - t)
 }
 
-lambda_ <- function(x, Z, c = 1.1, m = 500) {  
-  2*c * tau.hat_iter(x, Z) * Lambda.hat_(Z, m = m) / nrow(Z) 
+lambda_ <- function(x, Z, c = 1.1, m = 500, gamma = .05) {  
+  n <- nrow(Z); pz <- ncol(Z)
+  tau.hat <- tau.hat_iter(x, Z)
+  lambda.dat <- 2*c * tau.hat * Lambda.hat_(Z, m = m) / n
+  lambda.thr <- 2*c * tau.hat * sqrt(2*log(2*pz)/n)
+  list(lambda.dat = lambda.dat, lambda.thr = lambda.thr)
 }

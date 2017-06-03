@@ -38,6 +38,8 @@ obs. <- function(.config_id) {
     sigma0_v <- ((n * t(beta0) %*% Sigma_z %*% beta0 ) / (Fstar * sum(beta0^2) )) %>% sqrt
   }
   sigma0_h <- 1; sigma0_hv <- .3
+  sprintf("Fstar = %f", Fstar) %>% print
+  sprintf("sigma_v = %2.6f", sigma0_v) %>% print
   
   Z <- Z.(n, pz, Sigma_z)
   hv <- hv.(n, sigma0_h, sigma0_v, sigma0_hv)
