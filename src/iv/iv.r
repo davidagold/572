@@ -1,5 +1,6 @@
 #!/usr/bin/env Rscript
 # setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+library(dplyr)
 source("trial.r", chdir = TRUE)
 
 run <- function(){
