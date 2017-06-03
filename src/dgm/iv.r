@@ -25,7 +25,7 @@ yx. <- function(Z, h, v, beta0, theta0) {
 }
 
 obs. <- function(.config_id) {
-  configs <- read.csv("iv/config/configs.csv")
+  configs <- read.csv("config/configs.csv")
   config <- filter(configs, config_id == .config_id)
   n <- config$n; pz <- config$pz; Fstar <- config$Fstar; theta0 <- config$theta0
   
