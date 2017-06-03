@@ -42,7 +42,7 @@ trial <- function(config_id, trial_id, res_dir) {
     } else if ( !is.null(S.op) ) {
       s.hat <- NA; s.op <- length(S.op)
     }
-    fit.delta <- est.delta(y = y, x = x, Z = as.matrix(Z[, S.op]), ...)
+    fit.delta <- est.delta(y = y, X = x, Z = as.matrix(Z[, S.op]), ...)
     
     res$estimator[r] <- fit.delta$estimator
     res$statistic[r] <- fit.delta$theta.hat

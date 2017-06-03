@@ -11,6 +11,8 @@ tau.hat_iter <- function(x, Z, t = .05, c = 1.1, psi = .1, K = 100){
   tau.hat_k0 <- Inf
   id.maxcor <- map_dbl(1:pz, ~cor(x, Z[,.])) %>% which.max
   tau.hat_k1 <- psi * mean((x - predict(lm(x ~ Z[,id.maxcor])))^2)
+  sprintf("tau.hat_k1 = %.6f", tau.hat_k1) %>% print
+  sprintf("sd(x) = %.6f", mean((x - mean(x))^2)) %>% print
   nu <- .2 * sd(x)
   k <- 1
   while ( abs(tau.hat_k1 - tau.hat_k0) > nu & k < K ) {
@@ -35,10 +37,13 @@ Lambda.hat_ <- function(Z, t = .05, m = 500){
     quantile(1 - t)
 }
 
-lambda_ <- function(x, Z, c = 1.1, m = 500, gamma = .05) {  
+lambda_ <- function(x, Z, c = 1.1, m = 500, gamma = .05, tau.est = "sd.x") {  
   n <- nrow(Z); pz <- ncol(Z)
+  # if ( tau.est = "sd.x" ) {
+  #   tau.hat <- 
+  # }
   tau.hat <- tau.hat_iter(x, Z)
   lambda.dat <- 2*c * tau.hat * Lambda.hat_(Z, m = m) / n
-  lambda.thr <- 2*c * tau.hat * sqrt(2*log(2*pz)/n)
+  lambda.thr <- 2*c * tau.hat * sqrt(2*log(2*pz)) / sqrt(n)
   list(lambda.dat = lambda.dat, lambda.thr = lambda.thr)
 }

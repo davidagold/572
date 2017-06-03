@@ -5,10 +5,10 @@
 #########################################################################
 # 2-Stage Least Squares
 
-tsls <- function(y, x, Z, ...) {
+tsls <- function(y, X, Z, ...) {
   n <- nrow(Z)
   Z <- cbind(ones(n), Z)
-  X <- cbind(ones(n), x); Xt <- t(X); XtX <- Xt %*% X
+  X <- cbind(ones(n), X); Xt <- t(X); XtX <- Xt %*% X
   num <- Xt %*% P(Z, y) 
   denom <- Xt %*% P(Z, X)
   delta.hat <- solve(denom, num) %>%
