@@ -72,7 +72,7 @@ trial <- function(config_id, trial_id, res_dir) {
 
   lambda <- lambda_(x = obs$x, Z = obs$Z)
   fit.beta.IL <- lasso(y = obs$x, X = obs$Z, lambda = lambda)
-  fit.beta.CV <- cv.lasso(y = obs$x, X = obs$Z)
+  fit.beta.CV <- cv.lasso(y = obs$x, X = obs$Z, epsilon = .1)
   fit.beta.CV
   # list(x = obs$x, y = obs$y, Z = obs$Z)
 
