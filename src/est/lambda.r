@@ -21,7 +21,7 @@ tau.hat_iter <- function(x, Z, t = .05, c = 1.1, psi = .1, K = 100){
     lambda <- 2*c * tau.hat_k1 * sqrt(2*log(2*pz)/n)
     fit <- lasso(x, Z, lambda = lambda)
     tau.hat_k1 <- (sum((x - fit$beta0.hat - Z %*% fit$beta)^2)/n) %>% sqrt
-    print(tau.hat_k1)
+    sprintf("tau.hat_k1 = %.6f", tau.hat_k1) %>% print
     k <- k + 1
   }
   tau.hat_k1
@@ -43,7 +43,7 @@ lambda_ <- function(x, Z, c = 1.1, m = 500, gamma = .05, tau.est = "sd.x") {
   #   tau.hat <- 
   # }
   tau.hat <- tau.hat_iter(x, Z)
-  lambda.dat <- 2*c * tau.hat * Lambda.hat_(Z, m = m) / n
-  lambda.thr <- 2*c * tau.hat * sqrt(2*log(2*pz)) / sqrt(n)
+  lambda.dat <- c * tau.hat * Lambda.hat_(Z, m = m) / n
+  lambda.thr <- c * tau.hat * sqrt(2*log(2*pz)) / sqrt(n)
   list(lambda.dat = lambda.dat, lambda.thr = lambda.thr)
 }
