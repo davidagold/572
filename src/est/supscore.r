@@ -8,7 +8,7 @@
 test.sup.score <- function(obs, a = 1, level = 0.5, m = 500) {
   y <- obs$y; x <- obs$x; Z <- obs$Z
   n <- nrow(Z); pz <- ncol(Z)
-  Z <- scale(Z, scale = apply(Z, 2, mysd))
+  Z <- scale(Z, scale = apply(Z, 2, my.sd))
   sup.score <- map_dbl(1:pz, ~ abs(sum((y - x*a) * Z[,.])) / 
                          sqrt(mean((y - x*a)^2 * Z[,.]^2))) %>% max
   
