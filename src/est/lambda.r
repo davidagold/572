@@ -18,7 +18,7 @@ tau.hat_iter <- function(x, Z, t = .05, c = 1.1, psi = .1, K = 100){
   while ( abs(tau.hat_k1 - tau.hat_k0) > nu & k < K ) {
     tau.hat_k0 <- tau.hat_k1
     # lambda <- 2 * c * tau.hat_k1 * Lambda.hat / n
-    lambda <- 2*c * tau.hat_k1 * sqrt(2*log(2*pz)/n)
+    lambda <- c * tau.hat_k1 * sqrt(2*log(2*pz)/n)
     fit <- lasso(x, Z, lambda = lambda)
     tau.hat_k1 <- (sum((x - fit$beta0.hat - Z %*% fit$beta)^2)/n) %>% sqrt
     sprintf("tau.hat_k1 = %.6f", tau.hat_k1) %>% print
