@@ -52,7 +52,7 @@ fuller <- function(y, X, Z, W = NULL, C = 1, ...) {
   SigmaB.hat <- sigma2.hat * (1 - alpha.tilde)^2 * t(X.tilde) %*% P(Z, X.tilde) +
     alpha.tilde^2 * t(X.tilde) %*% (X.tilde - P(Z, X.tilde))
   A.hat <- map(1:n, ~ { (P.Z[.,.] - tau) * Upsilon.hat[.,] %*% 
-                        (map(1:n, ~ t(u.hat[.]^2 * V.hat[.,] / n)) 
+                        (map(1:n, ~ { t(u.hat[.]^2 * V.hat[.,] / n) }) 
                                     %>% reduce(sum)) 
                       }) %>% reduce(sum)
   B.hat <- map(1:n, ~ { (u.hat[.]^2 - sigma2.hat) * V.hat[.,] %*% t(V.hat[.,]) }) %>%
