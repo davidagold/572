@@ -11,4 +11,4 @@
 #SBATCH --array=1-200
 
 config_id=$1; res_dir=$2
-Rscript power.R $config_id /homes/dag89/572/src/iv $res_dir
+Rscript power.R $config_id /homes/dag89/572/src $res_dir
