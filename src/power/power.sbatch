@@ -8,7 +8,7 @@
 #SBATCH -e err/power_%j.err    # File to which STDERR will be written
 #SBATCH --mail-type=ALL       # Type of email notification- BEGIN,END,FAIL,ALL
 #SBATCH --mail-user=dag89@uw.edu # Email to which notifications will be sent
-#SBATCH --array=1-200
+#SBATCH --array=1-100
 
 config_id=$1; res_dir=$2
-Rscript power.R $config_id /homes/dag89/572/src $res_dir
+Rscript power.r $config_id /homes/dag89/572/src $res_dir
