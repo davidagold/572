@@ -15,14 +15,17 @@ trial <- function(config_id, trial_id, res_dir) {
     SE_theta.hat = numeric(R),
     sigma.hat = numeric(R),
     s.hat = numeric(R),
-    s.op = numeric(R)
+    s.op = numeric(R),
+    lambda.min = numeric(R),
+    lambda.max = numeric(R),
+    lambda = numeric(R)
   )
   # Generate data
   obs <- obs.(config_id)
   n <- obs$n; pz <- obs$pz
   
   # helper function for recording results
-  record <- function(res, r, obs, fit.beta=NULL, S.op=NULL, est.delta, ...) {
+  record <- function(res, r, obs, fit.beta=NULL, S.op=NULL, est.delta, lambda.min=NA,lambda.max=NA, lambda=NA, ...) {
     print(r)
     y <- obs$y; x <- obs$x; Z <- obs$Z; pz <- obs$pz
     if ( !is.null(fit.beta) ) {
@@ -50,6 +53,9 @@ trial <- function(config_id, trial_id, res_dir) {
     res$sigma.hat[r] <- fit.delta$sigma.hat
     res$s.hat[r] <- s.hat
     res$s.op[r] <- s.op
+    res$lambda.min[r] <- lambda.min
+    res$lambda.max[r] <- lambda.max
+    res$lambda[r] <- lambda
     assign('res', res, envir=environment(record))
   }
   record_sup.score <- function(res, r, obs, level = .05) {
@@ -59,6 +65,9 @@ trial <- function(config_id, trial_id, res_dir) {
     res$sigma.hat[r] <- NA
     res$s.hat[r] <- NA
     res$s.op[r] <- NA
+    res$lambda.min[r] <- NA
+    res$lambda.max[r] <- NA
+    res$lambda[r] <- NA
     assign('res', res, envir=environment(record))
   }
   
@@ -74,30 +83,44 @@ trial <- function(config_id, trial_id, res_dir) {
   sprintf("lambda.dat = %2.6f", lambdas$lambda.dat) %>% print
   sprintf("lambda.thr = %2.6f", lambdas$lambda.thr) %>% print
   
-  fit.beta.IL <- lasso(y = obs$x, X = obs$Z, lambda = lambdas$lambda.thr)
+  fit.beta.IL <- lasso(y = obs$x, X = obs$Z, lambda = lambdas$lambda.thr, standardize=FALSE)
+  lambdas.IL <- fit.beta.IL$lambdas
+  lambda.max.IL <- lambdas.IL[1]
+  lambda.min.IL <- lambdas.IL[length(lambdas.IL)]
+  lambda.IL <- lambdas$lambda.thr
   sprintf("lambda.max (IR) = %2.6f", fit.beta.IL$lambdas[1]) %>% print
   sprintf("lambda.min (IR) = %2.6f", fit.beta.IL$lambdas[length(fit.beta.IL$lambdas)]) %>% print
   
-  fit.beta.CV <- cv.lasso(y = obs$x, X = obs$Z, epsilon = .1)
+  fit.beta.CV <- cv.lasso(y = obs$x, X = obs$Z, epsilon = .4, standardize=FALSE)
+  lambda.CV <- fit.beta.CV$lambda.min
   sprintf("lambda.max (CV) = %2.6f", fit.beta.CV$lambdas[1]) %>% print
   sprintf("lambda.min (CV) = %2.6f", fit.beta.CV$lambdas[length(fit.beta.IL$lambdas)]) %>% print
+  print("S.hat (CV) = "); which(fit.beta.CV$beta != 0) %>% print
+  
+  lambdas.CV <- fit.beta.CV$lambdas
+  lambda.max.CV <- lambdas.CV[1]
+  lambda.min.CV <- lambdas.CV[length(lambdas.CV)]
 
   # IV(Lasso-IL)
-  record(res, r<-r+1, obs, fit.beta = fit.beta.IL, est.delta = tsls, estimator = "IV(Lasso-IL)")
+  record(res, r<-r+1, obs, fit.beta = fit.beta.IL, est.delta = tsls, lambda.min = lambda.min.IL, lambda.max = lambda.max.IL,
+         lambda = lambda.IL, estimator = "IV(Lasso-IL)")
   # Fuller(Lasso-IL)
-  record(res, r<-r+1, obs, fit.beta = fit.beta.IL, est.delta = fuller, estimator = "Fuller(Lasso-IL)")
+  record(res, r<-r+1, obs, fit.beta = fit.beta.IL, est.delta = fuller, lambda.min = lambda.min.IL, lambda.max = lambda.max.IL, 
+         lambda = lambda.IL, estimator = "Fuller(Lasso-IL)")
 
   # IV(Lasso-CV)
-  record(res, r<-r+1, obs, fit.beta = fit.beta.CV, est.delta = tsls, estimator = "IV(Lasso-CV)")
+  record(res, r<-r+1, obs, fit.beta = fit.beta.CV, est.delta = tsls, lambda.min = lambda.min.CV, lambda.max = lambda.max.CV,
+         lambda = lambda.CV, estimator = "IV(Lasso-CV)")
   # Fuller(Lasso-CV)
-  record(res, r<-r+1, obs, fit.beta = fit.beta.CV, est.delta = fuller, estimator = "Fuller(Lasso-CV)")
+  record(res, r<-r+1, obs, fit.beta = fit.beta.CV, est.delta = fuller, lambda.min = lambda.min.CV, lambda.max = lambda.max.CV,
+         lambda = lambda.CV, estimator = "Fuller(Lasso-CV)")
 
   # Sup-Score
   record_sup.score(res, r<-r+1, obs)
 
   res %>%
-    write.csv(paste(res_dir, config_id, sprintf("res%d.csv", trial_id), sep = "/"))
-  # print
+    # write.csv(paste(res_dir, config_id, sprintf("res%d.csv", trial_id), sep = "/"))
+  print
 }
 
 
