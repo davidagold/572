@@ -87,14 +87,11 @@ cv.lasso <- function(y, X, nfolds = 10, epsilon = NULL, K = 100, thresh = 1e-7,
   X <- map(1:p, ~ { X[,.] - mu.X[.] }) %>% reduce(cbind)
   sigma2.X <- map_dbl(1:p, ~ { mean(X[,.]^2) })
 
-  # y <- scale(y, scale = sd.y) %>% as.vector
   if ( standardize == TRUE ) {
     # X <- scale(X, scale = sqrt(sigma2.X)) %>% as.matrix
     X <- map(1:p, ~ { X[,.] / sqrt(sigma2.X[.]) }) %>% reduce(cbind)
     sigma2.X <- rep(1, p)
   }
-  # l2.X <- map_dbl(1:p, ~ { sum(X[,.]^2) %>% as.numeric })
-  # print(l2.X)
 
   epsilon <- ifelse(is.null(epsilon), ifelse(n > p, .0001, .01), epsilon)
 
