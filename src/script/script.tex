@@ -16,6 +16,9 @@
 \usepackage{cancel}
 \usepackage{listings}
 \usepackage{booktabs}
+\usepackage[table]{xcolor}
+\usepackage{colortbl}
+\usepackage{multirow}
 
 % Begin/End
 \newcommand{\be}{\begin{equation}}
@@ -121,7 +124,7 @@
 % Probability/Statistics
 \newcommand{\Prb}{\mathrm{P}}
 \newcommand{\E}{\mathrm{E}}
-\newcommand{\En}{\bar{\E}}
+\newcommand{\En}{\mathbb{E}_n}
 \newcommand{\Ehat}{\hat{\E}}
 \newcommand{\Ex}{\mathbb{E}}
 \newcommand{\Exn}{\Ex_n}
@@ -243,7 +246,7 @@ An important objective of econometrics research is to conduct inference for the 
 % CONFOUNDING
 
 \subsection{Confounding}\label{ss:conf}
-\newcommand{\efc}{\bs{\gamma}}
+\newcommand{\rg}{\bs{\gamma}}
 \newcommand{\W}{\bs{W}}
 \newcommand{\Z}{\bs{Z}}
 \newcommand{\erry}{\gep}
@@ -288,6 +291,7 @@ The presently studied paper, \cite{BCH11}, considers IV models in which regressi
 \subsection{Notation}
 \renewcommand{\d}{\bs{d}}
 \newcommand{\dhat}{\hat{\d}}
+\renewcommand{\dh}{\hat{\d}}
 \newcommand{\dhatc}{\hat{d}}
 \newcommand{\dhati}{\dhatc_i}
 \newcommand{\db}{\d_{\regb}}
@@ -300,9 +304,10 @@ The presently studied paper, \cite{BCH11}, considers IV models in which regressi
 \newcommand{\kp}{\otimes}
 \newcommand{\kpt}{\kp2}
 \newcommand{\B}{\bs{B}}
-\newcommand{\ip}[3]{#3\langle#1,#2 #3\rangle}
+\newcommand{\ip}[1]{\langle#1\rangle}
+\newcommand{\ipp}[2]{#2\langle#1 #2\rangle}
 
-For $p\in\N$, we let $[p] := \{1,\ldots,p\}$. We let bold and non-bold lowercase letters denote vectors and scalars, respectively; we use bold uppercase letters to denote matrices. We typically denote the components of a vector (matrix) by the non-bold (lowercase) counterpart of the letter that denotes the vector (matrix). If $\Z = (z_{ij})_{i,j\in[n]\times[p]}$, we use a superscript to refer to columns $\z^j = (z_{ij})_{i\inn}$ and a subscript to refer to rows $\z_i = (z_{ij})_{j\in[p]}$. We let $\|\cdot\|_p$ denote the usual $\ell_p$ norm over Euclidean spaces.  For $\u \in \R^p$, we let $\supp(\u) := \{j\in[p]: u_j \neq 0\}$ and $\|\u\|_0 = |\supp(\u)|$; we let $\|\u\|_\infty = \max_{j\in[p]} \{u_j\}$. We let $\otimes$ denote the Kronecker product and write $\u^{\kpt} = \u \kp \u$ for $\u\in\R^p$; for conformal matrices $\B$ we write $\|\u\|_{\B} = \ip{\u}{\B\u}{}$. If $x$ is a (random or deterministic) quantity indexed by $i\inn$, we let $\Exn[x_i] = n^{-1}\sum_{i=1}^n x_i$. For $a,b\in\R$, we let $a\vee b = \max\{a,b\}$ and $a\wedge b = \min\{a,b\}$. We write $a_n \lesssim b_n$ if $a_n \leq Cb_n$ for a universal constant $C$; we write $a_n \lesssim_\Prb b_n$ if $a_n = O_\Prb(b_n)$. We say that an event $\event \equiv \event_n$ occurs with high probability if $\lim_{n\to\infty} \Prb \, \event = 1$. 
+For $p\in\N$, we let $[p] := \{1,\ldots,p\}$. We let bold and non-bold lowercase letters denote vectors and scalars, respectively; we use bold uppercase letters to denote matrices. We typically denote the components of a vector (matrix) by the non-bold (lowercase) counterpart of the letter that denotes the vector (matrix). If $\Z = (z_{ij})_{i,j\in[n]\times[p]}$, we use a superscript to refer to columns $\z^j = (z_{ij})_{i\inn}$ and a subscript to refer to rows $\z_i = (z_{ij})_{j\in[p]}$. We let $\|\cdot\|_p$ denote the usual $\ell_p$ norm over Euclidean spaces.  For $\u \in \R^p$, we let $\supp(\u) := \{j\in[p]: u_j \neq 0\}$ and $\|\u\|_0 = |\supp(\u)|$; we let $\|\u\|_\infty = \max_{j\in[p]} \{u_j\}$. We let $\otimes$ denote the Kronecker product and write $\u^{\kpt} = \u \kp \u$ for $\u\in\R^p$; for conformal matrices $\B$ we write $\|\u\|_{\B} = \ip{\u,\B\u}$. If $x$ is a (random or deterministic) quantity indexed by $i\inn$, we let $\Exn[x_i] = n^{-1}\sum_{i=1}^n x_i$. For $a,b\in\R$, we let $a\vee b = \max\{a,b\}$ and $a\wedge b = \min\{a,b\}$. We write $a_n \lesssim b_n$ if $a_n \leq Cb_n$ for a universal constant $C$; we write $a_n \lesssim_\Prb b_n$ if $a_n = O_\Prb(b_n)$. We say that an event $\event \equiv \event_n$ occurs with high probability if $\lim_{n\to\infty} \Prb \, \event = 1$. 
 %we let $\En = \E\circ\Exn$ denote the ``average expectation'' operator
 
 
@@ -310,8 +315,6 @@ For $p\in\N$, we let $[p] := \{1,\ldots,p\}$. We let bold and non-bold lowercase
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % METHODS
-
-
 \newcommand{\px}{p_{\x}}
 \newcommand{\pu}{p_{\u}}
 \newcommand{\pun}{p_{\u,n}}
@@ -339,7 +342,7 @@ For $p\in\N$, we let $[p] := \{1,\ldots,p\}$. We let bold and non-bold lowercase
 \renewcommand{\sb}{s}
 \newcommand{\gramhat}{\hat{\bs{\Sigma}}}
 \newcommand{\tune}{\lambda}
-\newcommand{\ersi}{\gep_i}
+\newcommand{\esi}{u_i}
 \newcommand{\sd}{\gs}
 \newcommand{\f}{\bs{f}}
 \newcommand{\fhat}{\hat{\f}}
@@ -350,9 +353,9 @@ For $p\in\N$, we let $[p] := \{1,\ldots,p\}$. We let bold and non-bold lowercase
 
 In Section \ref{ss:inf}, we discussed how IV and PL models come to bear on econometrics research. Efficient inference for both models requires accurate estimation of nonparametric regression functions such as in the $n$-indexed sequence of models
 \be\label{eq:mod1}
-	y_i \ = \ f(\u_i) + \ersi\,,
+	y_i \ = \ f(\u_i) + \esi\,,
 \ee
-where for each $i\in[n]$, $y_i \in \R$ is a response, $\u_i = (u_1,\ldots,u_{\pu}) \in \Us \subseteq \R^{\pu}$ for $\pu \equiv \pun$ are exposures, $\ersi \sim \Normal(0,\sd^2)$ with $\sd \equiv \sd_n$, and $f \equiv f_n : \Us \to \R$ is the target regression function. For brevity, we write $f_i := f(\u_i)$. 
+where for each $i\in[n]$, $y_i \in \R$ is a response, $\u_i = (u_1,\ldots,u_{\pu}) \in \Us \subseteq \R^{\pu}$ for $\pu \equiv \pun$ are exposures, $\esi \sim \Normal(0,\sd^2)$ with $\sd \equiv \sd_n$, and $f \equiv f_n : \Us \to \R$ is the target regression function. For brevity, we write $f_i := f(\u_i)$. 
 
 In particular, efficient estimation of the treatment effect in the IV model depends crucially on consistent estimation of the conditional means of the endogenous variables given the instrumental variables; see \cite{A74}, \cite{N90}. In turn, it is important to identify conditions under which such estimation is possible. 
 
@@ -391,7 +394,7 @@ It would be unfortunate and ironic if, in order accommodate the many instrumenta
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % APPROXIMATE SPARSITY
-\subsection{Approximate sparsity}
+\subsection{Approximate sparsity}\label{ss:sparsity}
 
 
 The previous section presented a tension between the objectives of, one the one hand, including sufficiently many instrumental variables (or transformations thereof) in one's first-stage regression in order to accurately estimate the conditional means of the endogenous variables and, on the other hand, including sufficiently few instrumental variables so as not to negate any putative efficiency gains. The primary contribution of the presently studied paper, \cite{BCH11}, is to use $\ell_1$-regularized estimation in the first-stage to reconcile these competing objectives. 
@@ -420,13 +423,21 @@ where $\ffb := (\fb(\z_i))_{i\inn}$. Under the typical assumptions that $\sd = O
 \begin{rek} As \cite{BCH11} consider fixed instrumental variables $\z^j$, the remainders $\remi$ are not stochastic quantities; hence the deterministic rate condition of Definition \ref{def:as}. This contrasts with the setting of \cite{N97}. \cite{BCCH12} consider random $\z^j$ and hence present approximate sparsity in terms of a probabilistic bound on the empirical approximation error. 
 \end{rek}
 
-As we will codify in the next section, the upshot of Definition \ref{def:as} is that one may apply modern statistical learning techniques to estimate an approximately sparse regression function at a near-oracle rate without any prior knowledge of which series terms ought to be included in the model. In the IV context, this benefit generalizes to the situation in which many instrumental variables are immediately available, say as levels of a large factor. By using $\ell_1$-regularized estimation methods, we needn't necessarily be caught between large finite-sample bias due to the use of many instrumental variables and asymptotic inefficiency due to corrections for the former.  
+As we will codify in Section \ref{s:theory}, the upshot of Definition \ref{def:as} is that one may apply modern statistical learning techniques to estimate an approximately sparse regression function at a near-oracle rate without any prior knowledge of which series terms ought to be included in the model. In the IV context, this benefit generalizes to the situation in which many instrumental variables are immediately available, say as levels of a large factor. By using $\ell_1$-regularized estimation methods, we needn't necessarily be caught between large finite-sample bias due to the use of many instrumental variables and asymptotic inefficiency due to corrections for the former.  
+
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% 
-\subsection{Lasso estimation}
+%% THEORETICAL RESULTS
+\section{Theoretical results}\label{s:theory}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%% LASSO ESTIMATION
+\subsection{Feasible Lasso estimators}\label{ss:feasible}
 \newcommand{\minse}{\phi_{\mathrm{min}}}
 \newcommand{\maxse}{\phi_{\mathrm{max}}}
 \newcommand{\cminse}{\kappa_*}
@@ -435,7 +446,7 @@ As we will codify in the next section, the upshot of Definition \ref{def:as} is 
 \newcommand{\gd}{\delta}
 \newcommand{\diff}{\bs{\gd}}
 
-In this section, we briefly review the conditions that lead to good performance for Lasso estimators. There two primary ingredients: (i) suitable choice of the tuning parameter $\tune$, and (ii) conditions on the empirical Gram matrix $\gramhat = \Exn[\z_i^{\kpt}]$. Well-known oracle rates for the Lasso estimator fit to a model such as that of \eqref{eq:mod1} require that the tuning parameter dominate the ``noise'' term $\|\Exn[\z_i\ersi]\|_\infty$. For Gaussian $\ersi$, \cite{BC13} achieve as much with high probability by setting
+In this section, we briefly review the conditions that lead to good performance for Lasso estimators. There two primary ingredients: (i) suitable choice of the tuning parameter $\tune$, and (ii) conditions on the empirical Gram matrix $\gramhat = \Exn[\z_i^{\kpt}]$. Well-known oracle rates for the Lasso estimator fit to a model such as that of \eqref{eq:mod1} require that the tuning parameter dominate the ``noise'' term $\|\Exn[\z_i\esi]\|_\infty$. For Gaussian $\esi$, \cite{BC13} achieve as much with high probability by setting
 \be\label{tune1}
 %	\tune \ \geq \ 2 c \sd \Phi^{-1}(1-\gamma/2\pz)\,,
 	\tune \ = \ 2 c \sd \Lambda(1-\gamma\,|\,\Z)\,,
@@ -446,6 +457,8 @@ where $c, \gamma$ are controlled tolerances and
 	& \leq \ \sqrt{n}\Phi^{-1}(1-\gamma/2\pz) \ \leq \ \sqrt{2n\log(2\pz/\gamma)} \,,
 \end{align*}
 where $g_i \sim_{iid} \Normal(0,1), i\in[n]$ and the estimate of the right-hand side above features in the tuning parameter suggestion by \cite{BRT09}. In practice, one typically sets $c,\gamma$ to 1.1, 0.5, respectively; $\Lambda$ can be estimated easily via simulation. Furthermore, one must estimate the structural noise level $\sd$; \cite{BCH11} provide an iterative algorithm for this in their Appendix A. In the sequel, we refer, as do \cite{BCH11}, to Lasso estimators with tuning parameters informed by true and estimated structural noise levels as infeasible and feasible Lasso estimators, respectively. \cite{BCCH12} introduce a tuning parameter regime for the feasible Lasso in the case of non-Gaussian, heterscedastic structural noise. We do not consider their procedure here. 
+
+[ DISCUSS FEASIBLE LASSO ESTIMATORS HERE ]
 
 The aforementioned rates also required good behavior of certain moduli of continuity of the empirical Gram matrix. This condition appears in different forms in the literature --- for instance, the compatibility condition or restricted eigenvalues condition. \cite{BCH11} introduce it in terms of the minimal and maximal $m$-sparse eigenvalues of a semidefinite matrix $\M \in \R^{q \times q}$, defined respectively as
 \benn
@@ -463,7 +476,7 @@ We say that the sequence of design matrices $\Z \equiv \Z_n$ with empirical Gram
 The following adaptation of \cite[Theorem 1]{BC13}, which is in turn an extension of the work of \cite{BRT09}, demonstrates that the order of estimation and prediction error of the (feasible) Lasso does not suffer under the assumption of approximately sparse regression functions $f$.
 
 \begin{thm}[{\cite[Theorem 1]{BCH11}}]\label{thm:1}
-Let $(y_i, \u_i)_{i\inn} \in \R^{1\times\pu}$ be distributed according an $n$-indexed sequence of models of \eqref{eq:mod1}, and suppose that (i) the respective sequence regression functions $f$ are approximately sparse with respect to transformations $\z \equiv \z_{,n}(\u)$ and approximation parameters $\regb$; (ii) condition SE holds. Then, for $n$ sufficiently large, the (feasible) Lasso estimator $\regbh$ fit to the model $\E[y_i\,|\,\z_i] = \ip{\z_i}{\regb}{}$ satisfies the following with probability at least $1-\gamma$:
+Let $(y_i, \u_i)_{i\inn} \in \R^{1\times\pu}$ be distributed according an $n$-indexed sequence of models of \eqref{eq:mod1}, and suppose that (i) the respective sequence regression functions $f$ are approximately sparse with respect to transformations $\z \equiv \z_{,n}(\u)$ and approximation parameters $\regb$; (ii) condition SE holds. Then, for $n$ sufficiently large, the (feasible) Lasso estimator $\regbh$ fit to the model $\E[y_i\,|\,\z_i] = \ip{\z_i,\regb}$ satisfies the following with probability at least $1-\gamma$:
 \benn
 	C_1\|\regbh - \regb\|_2 \ \leq \ \|\regbh-\regb\|_{\gramhat} \ \leq \ C_2 \sd \sqrt{s\log(2\pz/\gamma)/n} \,,
 \eenn
@@ -475,20 +488,20 @@ Theorem \ref{thm:1} provides the basis for the subsequent results concerning Las
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%
+%% LASSO ESTIMATION
 \subsection{Inference for IV models}
 \newcommand{\regt}{\gth}
 \newcommand{\regg}{\bs{\gamma}}
-\newcommand{\rega}{\bs{\ga}}
-\newcommand{\regahat}{\hat{\rega}}
-\newcommand{\erfi}{v_i}
-\newcommand{\erfc}{v}
-\newcommand{\ersc}{\gep}
-\newcommand{\sds}{\sd_\ersc}
-\newcommand{\sdf}{\sd_\erfc}
+\newcommand{\rd}{\bs{\delta}}
+\newcommand{\rdhat}{\hat{\rd}}
+\newcommand{\efi}{v_i}
+\newcommand{\efc}{v}
+\newcommand{\esc}{u}
+\newcommand{\sds}{\sd_\esc}
+\newcommand{\sdf}{\sd_\efc}
 \renewcommand{\a}{\bs{a}}
-\newcommand{\ahat}{\hat{\a}}
-\newcommand{\sdfs}{\sd_{\erfc\ersc}}
+\newcommand{\ah}{\hat{\a}}
+\newcommand{\sdfs}{\sd_{\esc\efc}}
 \newcommand{\xinst}{\x^\dagger}
 \newcommand{\xinsti}{x_i^\dagger}
 \newcommand{\ainst}{\a^\dagger}
@@ -505,100 +518,336 @@ Theorem \ref{thm:1} provides the basis for the subsequent results concerning Las
 \newcommand{\Om}{\bs{\Omega}}
 \newcommand{\Omn}{\Om_n}
 \newcommand{\EEn}{\bar{\E}}
-\newcommand{\regaiv}{\regahat^\dagger}
+\newcommand{\rdiv}{\rdhat^\dagger}
 \newcommand{\sdshat}{\hat{\sds}}
 
 
 Consider an $n$-indexed sequence of IV models given by
 \be\label{mod:iv}
-	y_i \ = \ x_i\regt + \langle\w_i, \regg\rangle + \ersi\,, \qquad x_i \ = \ d(\u_i) + \erfi \,,
+	y_i \ = \ x_i\regt + \langle\w_i, \regg\rangle + \esi\,, \qquad x_i \ = \ d(\u_i) + \efi \,,
 \ee
-where $y_i \in \R$ is a response, $x_i \in \R$ is an endogenous treatment variable, $\w_i\in\R^{\pw}$ are exogenous ``control'' variables, $\u_i \in \R^{\pz}$ are instrumental variables that may intersect non-trivially with $\w_i$, $d$ is an unknown regression function, and the errors $\erfi, \ersi$ satisfy
+where $y_i \in \R$ is a response, $x_i \in \R$ is an endogenous treatment variable, $\w_i\in\R^{\pw}$ are exogenous ``control'' variables, $\u_i \in \R^{\pz}$ are instrumental variables that may intersect non-trivially with $\w_i$, $d$ is an unknown regression function, and the errors $\efi, \esi$ satisfy
 \benn
-	\begin{pmatrix} \erfi \,|\, \u_i \\[-.5em] \ersi \,|\, \u_i \end{pmatrix} \ \sim \ \Normal\left(\bs{0}, \begin{pmatrix} \sdf^2 & \sdfs \\[-.5em] \sdfs & \sds^2 \end{pmatrix} \right)\,.
+	\begin{pmatrix} \efi \,|\, \u_i \\[-.5em] \esi \,|\, \u_i \end{pmatrix} \ \sim \ \Normal\left(\bs{0}, \begin{pmatrix} \sdf^2 & \sdfs \\[-.5em] \sdfs & \sds^2 \end{pmatrix} \right)\,.
 \eenn
-Our objective is efficient inference for $\regt$. For brevity, write $\a_i := (x_i, \w_i), \rega := (\regt, \regg)$ so that $y_i = \langle \a_i, \rega \rangle + \ersi$. If $\xinst \equiv (\xinsti)_{i\inn}$ are instruments for $\x \equiv (x_i)_{i\inn}$, then the standard IV estimator is given by
-\be\label{def:regaiv}
-	\regaiv(\xinst) \ = \ (\Exn[\ainsti(\xinsti) \kp \a_i])^{-1}\Exn[\ainsti(\xinsti) y_i] \,,
+Our objective is efficient inference for $\regt$. For brevity, write $\a_i := (x_i, \w_i), \rd := (\regt, \regg)$ so that $y_i = \langle \a_i, \rd \rangle + \esi$. If $\xinst \equiv (\xinsti)_{i\inn}$ are instruments for $\x \equiv (x_i)_{i\inn}$, then the standard IV estimator is given by
+\be\label{def:raiv}
+	\rdiv(\xinst) \ = \ (\Exn[\ainsti(\xinsti) \kp \a_i])^{-1}\Exn[\ainsti(\xinsti) y_i] \,,
 \ee
-where $\ainst_i(\xinsti) := (\xinsti, \w_i)$. Under ``standard conditions,'' $\regaiv(\xinst)$ satisfies
+where $\ainst_i(\xinsti) := (\xinsti, \w_i)$. Under ``standard conditions,'' $\rdiv(\xinst)$ satisfies
 \benn
-	\sqrt{n}(\regaiv(\xinst) - \rega) \ = \ \g + \rm\,, \qquad \g \ \sim \ \Normal(\bs{0}, \Qn^{-1}\Omn\Qn^{-1\tp})\,,
+	\sqrt{n}(\rdiv(\xinst) - \rd) \ = \ \g + \rm\,, \qquad \g \ \sim \ \Normal(\bs{0}, \Qn^{-1}\Omn\Qn^{-1\tp})\,,
 \eenn
-where $\Qn \equiv \Qn(\xinst) := \En[\ainst_i(\xinsti) \kp \a_i]$, $\Omn \equiv \Omn(\xinst) := \sds^2\En[\ainsti(\xinsti)^{\kpt}]$, and $\|\rm\|_\infty = o_{\Prb}(1)$. If $\xinsti = d_i := d(\u_i)$, then $\E[\xinsti x_i] = \E[d_i^2 + d_i\erfi] = \E[d_i^2]$, in which case $\Qn = \Omn/\sds^2$ and hence
+where $\Qn \equiv \Qn(\xinst) := \En[\ainst_i(\xinsti) \kp \a_i]$, $\Omn \equiv \Omn(\xinst) := \sds^2\En[\ainsti(\xinsti)^{\kpt}]$, and $\|\rm\|_\infty = o_{\Prb}(1)$. If $\xinsti = d_i := d(\u_i)$, then $\E[\xinsti x_i] = \E[d_i^2 + d_i\efi] = \E[d_i^2]$, in which case $\Qn = \Omn/\sds^2$ and hence
 \benn
 	\var(\g) \ = \ \sds^2\Qn^{-1} \ = \ \sds^2\big(\En\big[\ainsti(d_i)^{\kpt}\big]\big)^{-1} \,,
 \eenn
-the semiparametric efficiency bound for estimating $\rega$ --- c.f. \cite{BCCH12}, \cite{A74}, \cite{C87}, \cite{N90}. The $d_i$ are therefore regarded as \emph{optimal instruments}. In the sequel, we let unqualified use of $\ainsti$ refer to $\ainsti(d_i)$. 
+the semiparametric efficiency bound for estimating $\rd$ --- c.f. \cite{BCCH12}, \cite{A74}, \cite{C87}, \cite{N90}. The $d_i$ are therefore regarded as \emph{optimal instruments}. In the sequel, we let unqualified use of $\ainsti$ refer to $\ainsti(d_i)$. 
 
-In practice, the $d_i$ are not available and estimates $\dhati$ must be used instead. The foregoing discussion suggests that, in order for $\regaiv(\dhat)$ to achieve asymptotic efficiency, $\dhat$ must ``consistently'' estimate $\d$ at a sufficiently fast rate. The following theorem of \cite{BCH11} demonstrates that, if the regression functions $d$ are approximately sparse, then Lasso-based estimates suffice.
+In practice, the $d_i$ are not available and estimates $\dhati$ must be used instead. The foregoing discussion suggests that, in order for $\rdiv(\dhat)$ to achieve asymptotic efficiency, $\dhat$ must ``consistently'' estimate $\d$ at a sufficiently fast rate. The following theorem of \cite{BCH11} demonstrates that, if the regression functions $d$ are approximately sparse, then Lasso-based estimates suffice.
 
 % Theorem 3
-\begin{thm}[{\cite[Theorem 3]{BCH11}}]
-Let $(y_i, \a_i, \u_i)_{i\inn}$ be distributed according to \eqref{mod:iv} for each $n$. Suppose that: (i) the regression functions $d$ are approximately sparse with respect to transformations $\z(\u) \in \R^{\pz}$ and approximation parameters $\regb$; (ii) $\dhat = (\langle \z_i,\regbh\rangle)_{i\inn}$, where $\regbh$ is a feasible (Post-) Lasso estimator of $\regb$; (iii) $\sdf, \sds$ and the eigenvalues of $\Qn \equiv \Qn(\dhat)$ are bounded strictly away from zero and infinity uniformly in $n$; (iv) Condition SE holds for $\gramhat$ with high probability; (v) $s = \supp(\regb)$ and $\pz$ satisfy $\sb^2\log^2(\pz\vee n) = o(n)$. Then, the IV estimator $\regaiv \equiv \regaiv(\dhat)$ satisfies
+\begin{thm}[{\cite[Theorem 3]{BCH11}}]\label{thm:3}
+Let $(y_i, \a_i, \u_i)_{i\inn}$ be distributed according to \eqref{mod:iv} for each $n$. Suppose that: (i) the regression functions $d$ are approximately sparse with respect to transformations $\z(\u) \in \R^{\pz}$ and approximation parameters $\regb$; (ii) $\dhat = (\langle \z_i,\regbh\rangle)_{i\inn}$, where $\regbh$ is a feasible (Post-) Lasso estimator of $\regb$; (iii) $\sdf, \sds$ and the eigenvalues of $\Qn \equiv \Qn(\dhat)$ are bounded strictly away from zero and infinity uniformly in $n$; (iv) Condition SE holds for $\gramhat$ with high probability; (v) $s = \supp(\regb)$ and $\pz$ satisfy $\sb^2\log^2(\pz\vee n) = o(n)$. Then, the IV estimator $\rdiv \equiv \rdiv(\dhat)$ satisfies
 \benn
-	(\sds^2\Qn^{-1})^{-1/2} \sqrt{n}(\regaiv-\rega) \ = \ \g + \rm\,, \qquad \g \ \sim \ \Normal(\bs{0}, \Id) \,,
+	(\sds^2\Qn^{-1})^{-1/2} \sqrt{n}(\rdiv-\rd) \ = \ \g + \rm\,, \qquad \g \ \sim \ \Normal(\bs{0}, \Id) \,,
 \eenn
-where $\|\rm\|_\infty = o_\Prb(1)$. Moreover, the result continues to hold if $\Qn$ is replaced by $\Qnhat := \Exn\big[\ainstihatkpt\big]$ and $\sds^2$ by $\sdshat^2 := \Exn\big[(y_i -\langle \ainstihat, \regaiv\rangle)^2\big]$, where $\ainstihat := \ainsti(\dhat)$. 
+where $\|\rm\|_\infty = o_\Prb(1)$. Moreover, the result continues to hold if $\Qn$ is replaced by $\Qnhat := \Exn\big[\ainstihatkpt\big]$ and $\sds^2$ by $\sdshat^2 := \Exn\big[(y_i -\langle \ainstihat, \rdiv\rangle)^2\big]$, where $\ainstihat := \ainsti(\dhat)$. 
 \end{thm}
 
 The upshot of the foregoing theorem is that nonlinear IV estimation needn't incur efficiency penalties for high-dimensional series estimation of the endogenous regression functions. 
 
 
-
-
-
-
-
-
-
-
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%
-%% Instrumental Variables Models
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%\subsection{Instrumental Variables Models}
+%% SUP-SCORE STATISTIC
+\subsection{Weak instruments and the sup-score statistic}\label{ss:supscore}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%The linear IV model characterizes potential confounding of $x$ and $y$ as a matter of dependence between $x$ and an error term. Formally, we suppose that the observations $(y_i, x_i, \w_i, \z_i)$ for $i\in[n] := \{1,\ldots,n\}$ are independent and identically distributed according to
-%\begin{align}
-%	y_i \ & = \ x_i\reg + \w^\tp\nuis + h_i \,, \\
-%	x_i \ & = \ d(\inst_i) + v_i \,,
-%\end{align}
-%where
-%%where $h_i, v_i$ are mean-zero error terms satisfying $\var(h_i) = \sdh^2$, $\var(v_i) = \sdv^2$, and $\cov(h_i, v_i) = \covhv$. Throughout the present essay we restrict our consideration to the case in which each $h_i, v_i$ are jointly distributed as multivariate Gaussian. 
-%\be
-%	\begin{pmatrix} h_i \\ v_i \end{pmatrix} \ \sim \ \Normal\left(\bs{0}, \begin{pmatrix} \sdh^2 & \covhv \\ \covhv & \sdv^2 \end{pmatrix}\right) \,.
-%\ee
-%Here, $\w_i = (w_{i1},\ldots,w_{i\pw})$ is a vector of \emph{control variables} and $\inst_i = (\instc_{i1},\ldots,\instc_{i\pinst})$ is a vector of \emph{instrumental variables} that typically contains $\w_i$ and additional covariates. 
+% SECTION: RESULTS
+\section{Empirical results}\label{s:results}
+
+We present the results of simulation studies of the Lasso-based IV estimators in Section \ref{ss:simulations}. We then apply the foregoing methods to the problem of IV selection in \cite{AK91}, who use IV methods to estimate the returns to schooling in terms of log wage in adult life. Christian Hansen was kind enough to provide us with the MATLAB source code used to conduct the original simulations and the econometric analysis. 
+
+\subsection{Simulations}\label{ss:simulations}
+\newcommand{\rpc}{\pi}
+\newcommand{\rp}{\bs{\rpc}}
+\newcommand{\rpj}{\rpc_j}
+\newcommand{\rS}{\bs{\Sigma}}
+\newcommand{\0}{\bs{0}}
+\newcommand{\rt}{\theta}
+\newcommand{\rtiv}{\hat{\rt}^\dagger}
+\newcommand{\sdz}{\sigma_{z}}
+\newcommand{\vrz}{\sdz^2}
+\newcommand{\vry}{\sds^2}
+\newcommand{\vrv}{\sdf^2}
+\newcommand{\corr}{\mathrm{corr}}
+\newcommand{\seh}{\hat{\mathrm{SE}}}
+\newcommand{\ybar}{\bar{y}}
+\newcommand{\fga}{\hat{\alpha}}
+\newcommand{\lga}{\tilde{\alpha}}
+
+\newcommand{\dhi}{\hat{d}_i}
+\newcommand{\rdfl}{\hat{\rd}_{\fga}}
+\newcommand{\rppl}{\hat{\rp}_{\mathrm{PL}}}
+\newcommand{\rph}{\hat{\rp}}
+\newcommand{\rphc}{\hat{\rpc}}
+\newcommand{\Sh}{\hat{S}}
+\newcommand{\rtfl}{\hat{\rt}_{\fga}}
+\newcommand{\PS}{\P_{\Sh}}
+
+%\newcommand{\raiv}
+
+We present the results of Monte Carlo experiments to evaluate the finite-sample performance of the methods suggested in Section \ref{s:methods} relative to Theorems \ref{thm:3} and .... The experiment design and parameter configurations are as specified in \cite[Section 5.3]{BCH11}. We focus in particular on discrepancies between ...  
+
+For each parameter configuration, we generate 500 generate samples of size $n \in \{100, 500\}$ according to the data-generating mechanism
+\benn
+\begin{split}
+	\z_i \ & \sim \ \Normal(\0, \rS) \\
+	x_i \ & = \ \ipp{\z_i,\rp}{} +\efi \\
+	y_i \ & = \ \rt x_i + \esi \,,
+\end{split}\qquad\qquad
+\begin{split}
+	\begin{pmatrix} \esi \\[-.5em] \efi \end{pmatrix}\,\big{|}\,\z_i \ \sim \ \Normal\left(\bs{0}, \begin{pmatrix} \sds^2 & \sdfs \\[-.5em] \sdfs & 		\sdf^2 \end{pmatrix} \right)\,,
+\end{split}
+\eenn
+where $\rt = 1$ is the parameter of interest, $y_i\in\R$ are the responses, $x_i\in\R$ is an endogenous variable and $\z_i\in\R^{100}$ are instrumental variables. We fix the following over all configurations: $\rS$ is given by $\rS_{jj} = \vrz = 1$ and $\corr(z_{ij}, z_{ik}) = .5^{|j-k|}$; we set $\vry = 1$ and $\corr(\esi, \efi \,|\, \z_i) = .3$. The remaining parameters may vary amongst trials.
+
+We consider four levels of the first-stage noise $\vrv$, based on ``signal levels'' $F^* \in \{0, 10, 40, 160\}$. At $F^* = 0$ , the level of ``no signal'', we set $\rp = \0$ and $\vrv = 1$. For the remaining levels, we set $\rpj = .7^{j-1}$ for each $j\in[100]$ and choose $\vrv$ to satisfy $\vrv = \frac{n\ipp{\rp, \rS\rp}{}}{F^*\ipp{\rp, \rp}{}}$\,. Our choices of $\rpj$ are motivated by the discussion of approximate sparsity in Section \ref{ss:sparsity}. 
+
+
+We compute the method of moments IV estimator $\rtiv$
+%\benn
+%	\rtiv \ = \ \big(\En[\dhi x_i]\big)^{-1} \En[\dhi y_i] \,, \qquad \seh(\rtiv) \ = \  \big(\En[(y_i - x_i\rtiv)^2] \En[\dhi^2]^{-1}\big)^{1/2}
+%\eenn
+where the $y_i$ and $x_i$ are first centered and where
+\vspace{-.7em}
+\begin{align*}
+% 	\dhi \ = \ \ip{\z_i, \rppl} \ = \ \z_{\Sh,i}'(\Z_{\Sh}'\Z_{\Sh})^{-1}\Z_{\Sh}'\x\,, \qquad
+ 	\dh \ = \ \ip{\z_i, \rppl} \ & = \ \P_{\Sh}\x\,, 
+	 & \P_{\Sh} = \Z_{\Sh} (\Z_{\Sh}'\Z_{\Sh})^{-1}\Z_{\Sh}' 
+\end{align*}
+is the estimate of $\E[\x\,|\,\Z]$ due to the Post-Lasso estimate $\rppl$. Recall that the latter is the ordinary least squares fit of $\x$ to the restricted design matrix $\Z_{\Sh} = (\z^j)_{j \in \Sh}$, where $\Sh = \{j\in[\pz] : \rphc_j \neq 0\}$ is the active set of the first-stage Lasso estimator $\rph$. Because of the linearity in the second-stage and the use of the Post-Lasso to estimate $\d$, the IV estimator $\rtiv$ is precisely the 2SLS fit of $\y$ to $\x, \Z_{\Sh}$. 
+
+Given an active set $\Sh$ due to a first-stage Lasso fit, we may also compute Fuller's modified LIML estimator based on $\Z_{\Sh}$: 
+\be\label{eq:fuller}
+%	\rtfl \ = \ \big(\En[x_i\dhi - \fga x_i^2]\big)^{-1}\En[x_i \yt - \fga x_i y_i
+	\rtfl \ = \ (\x' \PS\x - \fga\x'\x)^{-1}(\x \PS\y - \fga\x'\y) \,,
+\ee
+where
+\be\label{eq:fga}
+	\fga \ = \ \frac{\lga - (1 - \lga) C / (n - \pz - \px)}{1 - (1 - \lga) C / (n - \pz - \px)} \,,
+\ee
+\vspace{.2em}the quantity $\lga$ is the smallest eigenvalue of the matrix $\big([\y,\x]'[\y,\x]\big)^{-1}[\y,\x]'\PS[\y,\x]$, and $C$ is a controlled constant that bears on a bias-variance tradeoff (see \cite[Theorem 1, Corollary 2]{F77}). Following \cite{BCH11}, we set $C=1$, which entails that the higher-order bias of $\rtfl$ is 0. The LIML estimator itself is given by \eqref{eq:fuller} for $\fga = \lga$. 
+
+As remarked above, $\rtfl$ is a moment correction for the LIML estimator. The cost of this correction is the accuracy of the standard error estimates based on first order asymptotic approximations of $\var(\rtfl)$. Following \cite{BCH11}, we calculate the ``corrected'' standard errors of \cite{HHN08} based on those of \cite{B94}. The relevant formulas are in Appendix \ref{a:becker}. 
+
+For each trial, we fit each of the 2SLS and Fuller estimators based on both the iterated and cross-validated Lasso estimators described in Section \ref{ss:feasible}. We denote these estimators as 2SLS(Lasso-IL), 2SLS(Lasso-CV), Fuller(Lasso-IL), and Fuller(Lasso-CV), in the obvious order. We also fit 2SLS and Fuller estimators using as many instrumental variables $\z^j$ as the present configuration allows. When $n=100$, we randomly choose 98 variables $\z^j$ for fitting; when $n=500$, we include all the $\z^j$. We denote these estimators by 2SLS(All) and Fuller(All), respectively. For each estimator and parameter configuration, we compute the root-mean-square-error (RMSE), the median entrywise bias (Med. Bias), the empirical rejection probability of level 0.05 Wald tests (rp(0.05)), and the number of trials for which the first-stage Lasso estimator selected zero instrumental variables ($\|\rph\|_0 = 0$). Finally, for each trial we conducted a level 0.05 test of the hypothesis that $\rt = 1$ using the sup-score statistic of Section \ref{ss:supscore}. The rejection probabilities of the latter are tabulated under rp(0.05). We present the original results of \cite{BCH11} (in red) alongside our own (in black). In the interest of space, we defer the results for the $n=500$ trials to Appendix \ref{a:simulations}.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% TABLES
+\renewcommand{\baselinestretch}{1} 
+
+\definecolor{gray1}{gray}{0.85}
+\definecolor{darkred}{rgb}{.75,0,0}
+\newcolumntype{a}{>{\color{darkred}}c}
+\newcolumntype{b}{>{\color{darkred}}r}
+\newcommand{\sr}{\rule[-0.45cm]{0pt}{0.9cm}}
+
+\begin{table}[t!]
+\centering
+\caption{IV simulation results ($n = 100, F^* \in\{0, 10\})$}
+
+\small{
+\makebox[\textwidth][c]{
+\renewcommand{\arraystretch}{1.25}%
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}%
+\rowcolors{2}{gray!10}{white}
+\begin{tabular}{lcacacacarb}
+\toprule
+& \multicolumn{2}{c}{RMSE} & \multicolumn{2}{c}{Med. Bias} & \multicolumn{2}{c}{rp(0.05)} & \multicolumn{2}{c}{$\|\rph\|_0 = 0$} \\ 
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}\cmidrule(lr){8-9}
+\rowcolor{white!0} & \multicolumn{1}{c}{D.G.} & \multicolumn{1}{a}{A.B. et al.} &
+\multicolumn{1}{c}{D.G.} & \multicolumn{1}{a}{A.B. et al.} &
+\multicolumn{1}{c}{D.G.} & \multicolumn{1}{a}{A.B. et al.} &
+\multicolumn{1}{c}{D.G.} & \multicolumn{1}{a}{A.B. et al.} \\
+\midrule
+\rowcolor{white} No Signal \\
+  \cmidrule[.06em](lr{2em}){1-1}
+2SLS(All) & 0.311 & 0.318 & 0.296 & 0.305 & 0.876 & 0.862 &  &  \\ 
+  Fuller(All) & 1.957 & 2.398 & 0.369 & 0.248 & 0.714 & 0.704 &  &  \\ 
+  IV(Lasso-IL) & 0.442 & 0.511 & 0.315 & 0.338 & 0.124 & 0.014 & 486 & 455 \\ 
+  Fuller(Lasso-IL) & 0.422 & 0.509 & 0.313 & 0.338 & 0.096 & 0.010 & 486 & 455 \\ 
+  IV(Lasso-CV) & 0.333 & 0.329 & 0.296 & 0.301 & 0.466 & 0.652 & 0 & 0 \\ 
+  Fuller(Lasso-CV) & 0.353 & 0.359 & 0.295 & 0.305 & 0.288 & 0.384 & 0 & 0 \\ 
+  Sup-Score &  &  &  &  & 0.052 & 0.004 &  &  \\ 
+  \addlinespace[.5em]
+  \rowcolor{white} $F^* = 10$ \\
+  \cmidrule[.06em](lr{2em}){1-1}
+  2SLS(All) & 0.060 & 0.058 & 0.056 & 0.058 & 0.806 & 0.806 &  &  \\ 
+  Fuller(All) & 0.525 & 0.545 & 0.041 & 0.050 & 0.734 & 0.690 &  &  \\ 
+  IV(Lasso-IL) & 0.062 & 0.055 & 0.022 & 0.020 & 0.086 & 0.042 & 233 & 147 \\ 
+  Fuller(Lasso-IL) & 0.060 & 0.054 & 0.024 & 0.020 & 0.072 & 0.032 & 233 & 147 \\ 
+  IV(Lasso-CV) & 0.052 & 0.052 & 0.039 & 0.024 & 0.260 & 0.072 & 0 & 10 \\ 
+  Fuller(Lasso-CV) & 0.054 & 0.051 & 0.036 & 0.022 & 0.180 & 0.068 & 0 & 10 \\ 
+  Sup-Score &  &  &  &  & 0.044 & 0.006 &  &  \\ 
+\bottomrule
+\end{tabular}
+} % make box
+} % small
+\end{table}
+
+\begin{table}[t!]
+\centering
+\caption{IV simulation results ($n = 100, F^* \in\{40, 160\})$}
+
+\small{
+\makebox[\textwidth][c]{
+\renewcommand{\arraystretch}{1.25}%
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}%
+\rowcolors{2}{gray!10}{white}
+\begin{tabular}{lcacacacarb}
+\toprule
+& \multicolumn{2}{c}{RMSE} & \multicolumn{2}{c}{Med. Bias} & \multicolumn{2}{c}{rp(0.05)} & \multicolumn{2}{c}{$\|\rph\|_0 = 0$} \\ 
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}\cmidrule(lr){8-9}
+\rowcolor{white!0} & \multicolumn{1}{c}{D.G.} & \multicolumn{1}{a}{A.B. et al.} &
+\multicolumn{1}{c}{D.G.} & \multicolumn{1}{a}{A.B. et al.} &
+\multicolumn{1}{c}{D.G.} & \multicolumn{1}{a}{A.B. et al.} &
+\multicolumn{1}{c}{D.G.} & \multicolumn{1}{a}{A.B. et al.} \\
+\midrule
+  \rowcolor{white} $F^* = 40$ \\
+  \cmidrule[.06em](lr{2em}){1-1}
+  2SLS(All) & 0.081 & 0.081 & 0.076 & 0.072 & 0.654 & 0.626 &  &  \\ 
+  Fuller(All) & 0.660 & 0.951 & 0.031 & 0.050 & 0.758 & 0.690 &  &  \\ 
+  IV(Lasso-IL) & 0.055 & 0.051 & 0.011 & 0.012 & 0.064 & 0.048 &    1 & 1 \\ 
+  Fuller(Lasso-IL) & 0.056 & 0.051 & 0.009 & 0.011 & 0.056 & 0.046 &    1 & 1 \\ 
+  IV(Lasso-CV) & 0.054 & 0.048 & 0.012 & 0.016 & 0.070 & 0.058 &    0 & 0 \\ 
+  Fuller(Lasso-CV) & 0.055 & 0.049 & 0.009 & 0.014 & 0.060 & 0.050 &    0 & 0 \\ 
+  Sup-Score &  &  &  &  & 0.042 & 0.004 &  &  \\ 
+  \addlinespace[.5em]
+  \rowcolor{white} $F^* = 160$ \\
+  \cmidrule[.06em](lr{2em}){1-1}
+  2SLS(All) & 0.079 & 0.075 & 0.063 & 0.062 & 0.350 & 0.306 &  &  \\ 
+  Fuller(All) & 1.062 & 1.106 & 0.015 & 0.023 & 0.698 & 0.622 &  &  \\ 
+  IV(Lasso-IL) & 0.052 & 0.049 & 0.008 & 0.005 & 0.070 & 0.064 &    0 & 0 \\ 
+  Fuller(Lasso-IL) & 0.053 & 0.049 & 0.006 & 0.002 & 0.066 & 0.056 &    0 & 0 \\ 
+  IV(Lasso-CV) & 0.054 & 0.048 & 0.007 & 0.006 & 0.058 & 0.054 &    0 & 0 \\ 
+  Fuller(Lasso-CV) & 0.054 & 0.049 & 0.006 & 0.003 & 0.058 & 0.048 &    0 & 0 \\ 
+  Sup-Score &  &  &  &  & 0.046 & 0.004 &  &  \\ 
+\bottomrule
+\end{tabular}
+} % make box
+} % small
+\end{table}
+
+\renewcommand{\baselinestretch}{1.5} 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%
-%
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%
-%% 	PARTIALLY LINEAR MODELS
-%
-%\subsection{Partially Linear Models}
-%
-%The PL model assumes that potential confounders $\z$ of $x$ and $y$ are observed, but that the functional form by which each variable depends on $\z$ is unspecified. Formally, we suppose that the observations $(y_i, x_i, \z_i)$ are independent and identically distributed according to
-%\begin{align}
-%	y_i \ & = \ x_i\reg + g(\z_i) + h_i \,, \\
-%	x_i \ & = \ d(\z_i) + v_i \,,
-%\end{align}
-%where
-%\be
-%	\begin{pmatrix} h_i \\ v_i \end{pmatrix} \ \sim \ \Normal\left(\bs{0}, \begin{pmatrix} \sdh^2 & 0 \\ 0 & \sdv^2 \end{pmatrix}\right) \,.
-%\ee
-%
-%
-%
-%
+% 	SECTION: EMPIRICAL RESULTS 
+\subsection{Empirical results: returns to schooling}
+
+We apply the methodology developed in Sections \ref{s:methods} and \ref{s:theory} to conduct inference for the effect of years of schooling on log wage. The data consist of  U.S. Census 
 
 
 
+
+
+\appendix
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% APPENDIX A -- LASSO ITERATION METHOD
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% APPENDIX B -- HHN08 STANDARD ERRORS
+\section{Modified LIML estimator standard errors}\label{a:becker}
+\newcommand{\uh}{\hat{\u}}
+\newcommand{\uhc}{\hat{u}}
+\newcommand{\uhi}{\uhc_i}
+\newcommand{\sdsh}{\hat{\sds}}
+
+\cite{HHN08} extend the work of \cite{B94} to give corrected standard errors for the Fuller, or modified LIML, estimator given by \eqref{eq:fuller}, \eqref{eq:fga}. Let ...
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% APPENDIX C -- Simulation Results
+\section{IV simulation results}\label{a:simulations}
+
+\renewcommand{\baselinestretch}{1} 
+% 7
+\begin{table}[h!]
+\renewcommand{\arraystretch}{1.25}%
+\centering
+\caption{IV simulation results ($n = 500, F^* \in\{0, 10, 40, 160\})$}
+\small{
+\makebox[\textwidth][c]{
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}%
+\rowcolors{2}{gray!10}{white}
+\begin{tabular}{lcacacacarb}
+\toprule
+%\multirow{2}{*}{\raisebox{-.3em}{\scalebox{1.2}{$n=100$}}} 
+& \multicolumn{2}{c}{RMSE} & \multicolumn{2}{c}{Med. Bias} & \multicolumn{2}{c}{rp(0.05)} & \multicolumn{2}{c}{$\|\rph\|_0 = 0$} \\ 
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}\cmidrule(lr){8-9}
+\rowcolor{white!0} & \multicolumn{1}{c}{D.G.} & \multicolumn{1}{a}{A.B. et al.} &
+\multicolumn{1}{c}{D.G.} & \multicolumn{1}{a}{A.B. et al.} &
+\multicolumn{1}{c}{D.G.} & \multicolumn{1}{a}{A.B. et al.} &
+\multicolumn{1}{c}{D.G.} & \multicolumn{1}{a}{A.B. et al.} \\
+\midrule
+\rowcolor{white} No Signal \\
+  \cmidrule[.06em](lr{2em}){1-1}
+2SLS(All) & 0.312 & 0.312 & 0.297 & 0.297 & 0.860 & 0.852 &  &  \\ 
+  Fuller(All) & 1.255 & 1.236 & 0.282 & 0.318 & 0.074 & 0.066 &  &  \\ 
+  IV(Lasso-IL) & 0.421 & 0.477 & 0.279 & 0.296 & 0.152 & 0.012 &  494 & 486 \\ 
+  Fuller(Lasso-IL) & 0.406 & 0.477 & 0.279 & 0.296 & 0.104 & 0.012 &  494 & 486 \\ 
+  IV(Lasso-CV) & 0.327 & 0.478 & 0.302 & 0.299 & 0.546 & 0.064 &    0 & 348 \\ 
+  Fuller(Lasso-CV) & 0.355 & 0.474 & 0.303 & 0.299 & 0.346 & 0.054 &    0 & 348 \\ 
+  Sup-Score &  &  &  &  & 0.040 & 0.010 &  &  \\ 
+  \addlinespace[.5em]
+  \rowcolor{white} $F^* = 10$ \\
+  \cmidrule[.06em](lr{2em}){1-1}
+  2SLS(All) & 0.026 & 0.026 & 0.024 & 0.025 & 0.782 & 0.808 &  &  \\ 
+  Fuller(All) & 0.073 & 0.816 & 0.004 & 0.006 & 0.052 & 0.052 &  &  \\ 
+  IV(Lasso-IL) & 0.024 & 0.027 & 0.008 & 0.009 & 0.070 & 0.056 &  218 & 160 \\ 
+  Fuller(Lasso-IL) & 0.023 & 0.027 & 0.009 & 0.009 & 0.060 & 0.044 &  218 & 160 \\ 
+  IV(Lasso-CV) & 0.021 & 0.027 & 0.016 & 0.009 & 0.216 & 0.054 &    0 & 202 \\ 
+  Fuller(Lasso-CV) & 0.021 & 0.027 & 0.014 & 0.009 & 0.132 & 0.044 &    0 & 202 \\ 
+  Sup-Score &  &  &  &  & 0.036 & 0.004 &  &  \\ 
+  \addlinespace[.5em]
+  \rowcolor{white} $F^* = 40$ \\
+  \cmidrule[.06em](lr{2em}){1-1}
+  2SLS(All) & 0.036 & 0.036 & 0.033 & 0.032 & 0.636 & 0.636 &  &  \\ 
+  Fuller(All) & 0.042 & 0.038 & -0.000 & 0.000 & 0.038 & 0.036 &  &  \\ 
+  IV(Lasso-IL) & 0.024 & 0.022 & 0.005 & 0.003 & 0.048 & 0.048 &    0 & 0 \\ 
+  Fuller(Lasso-IL) & 0.024 & 0.022 & 0.004 & 0.002 & 0.042 & 0.038 &    0 & 0 \\ 
+  IV(Lasso-CV) & 0.023 & 0.022 & 0.005 & 0.004 & 0.048 & 0.052 &    0 & 0 \\ 
+  Fuller(Lasso-CV) & 0.023 & 0.022 & 0.004 & 0.003 & 0.038 & 0.042 &    0 & 0 \\ 
+  Sup-Score &  &  &  &  & 0.056 & 0.006 &  &  \\ 
+  \addlinespace[.5em]
+  \rowcolor{white} $F^* = 160$ \\
+  \cmidrule[.06em](lr{2em}){1-1}
+  2SLS(All) & 0.034 & 0.034 & 0.029 & 0.029 & 0.368 & 0.334 &  &  \\ 
+  Fuller(All) & 0.025 & 0.026 & 0.002 & 0.002 & 0.028 & 0.044 &  &  \\ 
+  IV(Lasso-IL) & 0.022 & 0.022 & 0.004 & 0.002 & 0.050 & 0.044 &    0 & 0 \\ 
+  Fuller(Lasso-IL) & 0.022 & 0.022 & 0.003 & 0.001 & 0.046 & 0.040 &    0 & 0 \\ 
+  IV(Lasso-CV) & 0.022 & 0.022 & 0.003 & 0.002 & 0.044 & 0.040 &    0 & 0 \\ 
+  Fuller(Lasso-CV) & 0.022 & 0.022 & 0.002 & 0.000 & 0.044 & 0.038 &    0 & 0 \\ 
+  Sup-Score &  &  &  &  & 0.060 & 0.010 &  &  \\ 
+\bottomrule
+\end{tabular}
+} % make box
+} % small
+\end{table}
+\renewcommand{\baselinestretch}{1.5} 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
